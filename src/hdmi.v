@@ -1,3 +1,11 @@
+// Atari 2000 Console
+//  Author: Michael Kohn
+//   Email: mike@mikekohn.net
+//     Web: https://www.mikekohn.net/
+//   Board: Sipeed Tang Nano 20K
+// License: MIT
+//
+// Copyright 2024-2025 by Michael Kohn
 
 module hdmi
 (

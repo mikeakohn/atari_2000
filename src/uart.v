@@ -1,8 +1,8 @@
-// W65C832 FPGA Soft Processor
+// Atari 2000 Console
 //  Author: Michael Kohn
 //   Email: mike@mikekohn.net
 //     Web: https://www.mikekohn.net/
-//   Board: iceFUN iCE40 HX8K
+//   Board: Sipeed Tang Nano 20K
 // License: MIT
 //
 // Copyright 2024 by Michael Kohn

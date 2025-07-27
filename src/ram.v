@@ -1,13 +1,13 @@
-// W65C832 FPGA Soft Processor
+// Atari 2000 Console
 //  Author: Michael Kohn
 //   Email: mike@mikekohn.net
 //     Web: https://www.mikekohn.net/
-//   Board: iceFUN iCE40 HX8K
+//   Board: Sipeed Tang Nano 20K
 // License: MIT
 //
-// Copyright 2024 by Michael Kohn
+// Copyright 2024-2025 by Michael Kohn
 
-// This creates 1024 bytes of RAM on the FPGA itself which begins at 0x4000.
+// This creates 4096 bytes of RAM on the FPGA itself.
 
 module ram
 (

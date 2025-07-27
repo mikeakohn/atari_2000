@@ -1,8 +1,8 @@
-// W65C832 FPGA Soft Processor
+// Atari 2000 Console
 //  Author: Michael Kohn
 //   Email: mike@mikekohn.net
 //     Web: https://www.mikekohn.net/
-//   Board: iceFUN iCE40 HX8K
+//   Board: Sipeed Tang Nano 20K
 // License: MIT
 //
 // Copyright 2024-2025 by Michael Kohn
@@ -177,23 +177,6 @@ sd_card_sdhc sd_card_0(
   .clk         (raw_clk),
   .reset       (reset)
 );
-
-/*
-flash_rom flash_rom_0(
-  .address     (address[23:0]),
-  .data_out    (flash_rom_data_out),
-  .busy        (flash_rom_busy),
-  .spi_cs      (windbond_cs),
-  .spi_clk     (windbond_clk),
-  .spi_do      (windbond_di),
-  .spi_di      (windbond_do),
-  .enable      (flash_rom_enable),
-  .flash_reset (windbond_reset),
-  .flash_wp    (windbond_wp),
-  .clk         (raw_clk),
-  .reset       (reset)
-);
-*/
 
 endmodule
 
