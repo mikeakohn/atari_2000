@@ -1,0 +1,42 @@
+
+PROGRAM=atari_2000
+SOURCE= \
+  src/$(PROGRAM).v \
+  src/addressing_mode.v \
+  src/encode_8b10b.v \
+  src/hdmi.v \
+  src/memory_bus.v \
+  src/peripherals.v \
+  src/ram.v \
+  src/reg_mode.v \
+  src/rom.v \
+  src/sd_card.v \
+  src/spi.v \
+  src/uart.v
+
+default:
+	yosys -q \
+	  -p "synth_gowin -top $(PROGRAM) -json $(PROGRAM).json -family gw2a" \
+	  $(SOURCE)
+	nextpnr-himbaechel -r \
+	  --json $(PROGRAM).json \
+	  --write $(PROGRAM)_pnr.json \
+	  --freq 27 \
+	  --vopt family=GW2A-18C \
+	  --vopt cst=tangnano20k.cst \
+	  --device GW2AR-LV18QN88C8/I7
+	gowin_pack -d GW2A-18 -o $(PROGRAM).fs $(PROGRAM)_pnr.json
+
+program:
+	iceFUNprog $(PROGRAM).bin
+
+blink:
+	naken_asm -l -type bin -o rom.bin test/blink.asm
+	python3 tools/bin2txt.py rom.bin > rom.txt
+
+clean:
+	@rm -f $(PROGRAM).bin $(PROGRAM).json $(PROGRAM).asc *.lst
+	@rm -f blink.bin load_byte.bin store_byte.bin test_subroutine.bin
+	@rm -f button.bin
+	@echo "Clean!"
+

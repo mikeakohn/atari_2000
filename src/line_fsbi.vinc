@@ -1,0 +1,15 @@
+
+// h_front_porch, h_sync, h_back_porch, h_image
+// v_front_porch, v_sync, v_back_porch, v_image
+
+assign in_hblank = hpos < H_FRONT_PORCH + H_SYNC + H_BACK_PORCH;
+assign in_vblank = vpos < V_FRONT_PORCH + V_SYNC + V_BACK_PORCH;
+wire guard_pixel =
+  hpos == H_FRONT_PORCH + H_SYNC + H_BACK_PORCH - 2 ||
+  hpos == H_FRONT_PORCH + H_SYNC + H_BACK_PORCH - 1;
+wire preamble_pixel =
+  hpos >= H_FRONT_PORCH + H_SYNC + H_BACK_PORCH - 10 &&
+  hpos <  H_FRONT_PORCH + H_SYNC + H_BACK_PORCH - 2;
+wire hsync = hpos >= H_FRONT_PORCH && hpos < H_FRONT_PORCH + H_SYNC;
+wire vsync = vpos >= V_FRONT_PORCH && vpos < V_FRONT_PORCH + V_SYNC;
+

@@ -1,0 +1,41 @@
+
+// 720x480 (896x500) 26.75MHz
+parameter WIDTH         = 896;
+parameter HEIGHT        = 500;
+
+parameter H_BACK_PORCH  = 88;
+parameter H_IMAGE       = 720;
+parameter H_FRONT_PORCH = 24;
+parameter H_SYNC        = 64;
+parameter H_INVERT      = 1'b1;
+
+parameter V_BACK_PORCH  = 7;
+parameter V_IMAGE       = 480;
+parameter V_FRONT_PORCH = 3;
+parameter V_SYNC        = 10;
+parameter V_INVERT      = 1'b0;
+
+// For GW1NR-9C C6/I5 (Tang Nano 9K proto dev board)
+rPLL #(
+  .FCLKIN    ("27"),
+  .IDIV_SEL  (8),  // -> PFD = 3 MHz (range: 3-400 MHz)
+  .FBDIV_SEL (43), // -> CLKOUT = 132 MHz (range: 3.125-600 MHz)
+  .ODIV_SEL  (4)   // -> VCO = 528 MHz (range: 400-1200 MHz)
+) pll (
+  .CLKOUTP  (),
+  .CLKOUTD  (),
+  .CLKOUTD3 (),
+  .RESET    (1'b0),
+  .RESET_P  (1'b0),
+  .CLKFB    (1'b0),
+  .FBDSEL   (6'b0),
+  .IDSEL    (6'b0),
+  .ODSEL    (6'b0),
+  .PSDA     (4'b0),
+  .DUTYDA   (4'b0),
+  .FDLY     (4'b0),
+  .CLKIN    (clk),     // 27 MHz
+  .CLKOUT   (clk_dvi), // 132 MHz
+  .LOCK     (clk_lock)
+);
+
