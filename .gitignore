@@ -3,7 +3,7 @@ rom.bin
 rom.txt
 rom.lst
 *.swp
-w65c832.asc
-w65c832.bin
-w65c832.json
+atari_2000.asc
+atari_2000.bin
+atari_2000.json
 

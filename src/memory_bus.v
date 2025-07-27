@@ -39,6 +39,14 @@ module memory_bus
   input  sd_card_do,
   output sd_card_clk,
   output sd_card_cs,
+  output dvi_d0_p,
+  output dvi_d0_n,
+  output dvi_d1_p,
+  output dvi_d1_n,
+  output dvi_d2_p,
+  output dvi_d2_n,
+  output dvi_ck_p,
+  output dvi_ck_n,
   input  reset
 );
 
@@ -134,6 +142,14 @@ peripherals peripherals_0(
   .uart_tx_0    (uart_tx_0),
   .uart_rx_0    (uart_rx_0),
   .load_count   (load_count),
+  .dvi_d0_p     (dvi_d0_p),
+  .dvi_d0_n     (dvi_d0_n),
+  .dvi_d1_p     (dvi_d1_p),
+  .dvi_d1_n     (dvi_d1_n),
+  .dvi_d2_p     (dvi_d2_p),
+  .dvi_d2_n     (dvi_d2_n),
+  .dvi_ck_p     (dvi_ck_p),
+  .dvi_ck_n     (dvi_ck_n),
   .reset        (reset)
 );
 
@@ -147,7 +163,7 @@ ram ram_1(
 );
 */
 
-sd_card sd_card_0(
+sd_card_sdhc sd_card_0(
   .address     (address[23:0]),
   .data_out    (flash_rom_data_out),
   .busy        (flash_rom_busy),

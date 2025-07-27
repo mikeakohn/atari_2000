@@ -10,9 +10,10 @@ SOURCE= \
   src/ram.v \
   src/reg_mode.v \
   src/rom.v \
-  src/sd_card.v \
+  src/sd_card_sdhc.v \
   src/spi.v \
-  src/uart.v
+  src/uart.v \
+  src/w65c832.v
 
 default:
 	yosys -q \
@@ -31,12 +32,10 @@ program:
 	iceFUNprog $(PROGRAM).bin
 
 blink:
-	naken_asm -l -type bin -o rom.bin test/blink.asm
+	naken_asm -l -type bin -o rom.bin samples/blink.asm
 	python3 tools/bin2txt.py rom.bin > rom.txt
 
 clean:
 	@rm -f $(PROGRAM).bin $(PROGRAM).json $(PROGRAM).asc *.lst
-	@rm -f blink.bin load_byte.bin store_byte.bin test_subroutine.bin
-	@rm -f button.bin
 	@echo "Clean!"
 

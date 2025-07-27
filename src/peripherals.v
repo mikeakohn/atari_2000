@@ -16,8 +16,6 @@ module peripherals
   input write_enable,
   input clk,
   input raw_clk,
-  output speaker_p,
-  output speaker_m,
   output joystick_0,
   output joystick_1,
   output joystick_2,
@@ -31,6 +29,14 @@ module peripherals
   output uart_tx_0,
   input  uart_rx_0,
   input [7:0] load_count,
+  output dvi_d0_p,
+  output dvi_d0_n,
+  output dvi_d1_p,
+  output dvi_d1_n,
+  output dvi_d2_p,
+  output dvi_d2_n,
+  output dvi_ck_p,
+  output dvi_ck_n,
   input reset
 );
 
@@ -73,6 +79,14 @@ wire [7:0] rx_data;
 wire rx_ready;
 reg  rx_ready_clear = 0;
 
+// Video.
+reg [7:0] red;
+reg [7:0] green;
+reg [7:0] blue;
+wire debug;
+wire in_hblank;
+wire in_vblank;
+
 /*
 always @(button_0) begin
   buttons = { 7'b0, ~button_0 };
@@ -80,12 +94,13 @@ end
 */
 
 always @(posedge raw_clk) begin
-  if (reset) speaker_value_high <= 0;
+  //if (reset) speaker_value_high <= 0;
 
   if (write_enable) begin
     case (address[5:0])
-      8: ioport_a <= data_in;
-      5'ha: ioport_b <= data_in;
+      5'h0: red   <= data_in;
+      5'h1: blue  <= data_in;
+      5'h2: green <= data_in;
       5'hb: begin tx_data <= data_in; tx_strobe <= 1; end
       5'he: spi_tx_buffer_1[7:0] <= data_in;
       5'h10: if (data_in[1] == 1) spi_start_1 <= 1;
@@ -101,8 +116,6 @@ always @(posedge raw_clk) begin
     if (enable) begin
       case (address[5:0])
         //6'h0: data_out <= buttons;
-        6'h8: data_out <= ioport_a;
-        6'ha: data_out <= ioport_b;
         6'hc: begin data_out <= rx_data; rx_ready_clear <= 1; end
         6'hd: data_out <= { rx_ready, tx_busy };
         6'he: data_out <= spi_tx_buffer_1[7:0];
@@ -140,6 +153,23 @@ uart uart_0
   .rx_ready       (rx_ready),
   .rx_ready_clear (rx_ready_clear),
   .rx_pin         (uart_rx_0)
+);
+
+hdmi hdmi_0(
+  .clk       (clk),
+  .dvi_d0_p  (dvi_d0_p),
+  .dvi_d0_n  (dvi_d0_n),
+  .dvi_d1_p  (dvi_d1_p),
+  .dvi_d1_n  (dvi_d1_n),
+  .dvi_d2_p  (dvi_d2_p),
+  .dvi_d2_n  (dvi_d2_n),
+  .dvi_ck_p  (dvi_ck_p),
+  .dvi_ck_n  (dvi_ck_n),
+  .in_hblank (in_hblank),
+  .in_vblank (in_vblank),
+  .red       (red),
+  .green     (green),
+  .blue      (blue)
 );
 
 endmodule
