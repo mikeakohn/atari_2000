@@ -54,7 +54,7 @@ wire [7:0] rom_data_out;
 wire [7:0] ram_data_out;
 wire [7:0] peripherals_data_out;
 //wire [7:0] block_ram_data_out;
-wire [7:0] flash_rom_data_out;
+wire [7:0] sd_data_out;
 
 wire [7:0] load_count;
 
@@ -84,18 +84,18 @@ wire peripherals_enable;
 assign peripherals_enable = (bank == 2 && upper_page == 0) && bus_enable;
 
 // FIXME: This probably shouldn't depend on flash_rom being enabled.
-wire flash_rom_busy;
-assign bus_halt = flash_rom_enable && flash_rom_busy;
+wire sd_busy;
+assign bus_halt = flash_rom_enable && sd_busy;
 
 // Based on the selected bank of memory (address[14:13]) select if
 // memory should read from ram.v, rom.v, peripherals.v.
 //assign data_out = address[15] == 0 ?
 //  (address[14] == 0 ? ram_data_out         : rom_data_out) :
-//  (address[14] == 0 ? peripherals_data_out : flash_rom_data_out);
+//  (address[14] == 0 ? peripherals_data_out : sd_data_out);
 
 always @ * begin
   if (bank == 3 || upper_page != 0) begin
-    data_out <= flash_rom_data_out;
+    data_out <= sd_data_out;
   end else if (bank == 0) begin
     data_out <= ram_data_out;
   end else if (bank == 1) begin
@@ -165,8 +165,8 @@ ram ram_1(
 
 sd_card_sdhc sd_card_0(
   .address     (address[23:0]),
-  .data_out    (flash_rom_data_out),
-  .busy        (flash_rom_busy),
+  .data_out    (sd_data_out),
+  .busy        (sd_busy),
   .spi_cs      (sd_card_cs),
   .spi_clk     (sd_card_clk),
   .spi_do      (sd_card_di),

@@ -11,11 +11,17 @@ IO_LOC "leds[4]" 19;
 IO_LOC "leds[5]" 20;
 
 // GPIO.
-//IO_LOC "joystick_0"  73;
-//IO_LOC "joystick_1"  74;
-//IO_LOC "joystick_2"  75;
-//IO_LOC "joystick_3"  85;
-//IO_LOC "joystick_4"  77;
+IO_LOC "joystick_0"  73;
+IO_LOC "joystick_1"  74;
+IO_LOC "joystick_2"  75;
+IO_LOC "joystick_3"  85;
+IO_LOC "joystick_4"  77;
+
+// SD Card,
+IO_LOC "sd_card_di"  76;
+IO_LOC "sd_card_do"  80;
+IO_LOC "sd_card_clk" 42;
+IO_LOC "sd_card_cs"  41;
 
 //SPI peripheral 0.
 //IO_LOC "spi_cs_0" 76;
@@ -38,10 +44,10 @@ IO_LOC "uart_rx_0" 29;
 //IO_LOC "speaker_m" 54;
 
 // Buttons.
-IO_LOC "button_reset"          87;
-IO_LOC "button_halt"           88;
-IO_LOC "button_program_select" 53;
-IO_LOC "button_0"              52;
+IO_LOC "button_reset"  87;
+IO_LOC "button_halt"   88;
+IO_LOC "button_select" 53;
+IO_LOC "button_0"      52;
 
 IO_PORT "button_reset"          IO_TYPE=LVCMOS33;
 IO_PORT "button_halt"           IO_TYPE=LVCMOS33;
