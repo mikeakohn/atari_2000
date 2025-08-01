@@ -17,28 +17,14 @@ start:
   ; Set X/Y to 32 bit.
   rep #0x10
 
-  brl loop
-
-  nop
-  nop
-  nop
-  nop
-  nop
-  brk
+  lda #0x8c
+  sta 0x0d
+  lda #0x01
+  sta 0x0e
+  lda #0xc0
+  sta 0x0f
 
 loop:
-  ;; LED on.
-  lda.b #0x01
-  sta 0x8008
-
-  jsr delay
-
-  ;; LED off.
-  lda.b #0x00
-  sta 0x8008
-
-  jsr delay
-
   jmp loop
 
 delay:

@@ -21,13 +21,15 @@ module hdmi
   output debug,
   output in_hblank,
   output in_vblank,
+  output reg [9:0] hpos,
+  output reg [9:0] vpos,
   input [7:0] red,
   input [7:0] green,
   input [7:0] blue
 );
 
-reg [9:0] hpos = 0;
-reg [9:0] vpos = 0;
+//reg [9:0] hpos = 0;
+//reg [9:0] vpos = 0;
 
 wire clk_pixel;
 wire clk_dvi;
@@ -58,8 +60,8 @@ wire in_image    = ~(in_hblank || in_vblank);
 //wire in_preamble = !in_vblank && preamble_pixel;
 //wire in_guard    = guard_pixel;
 //wire in_preamble = preamble_pixel;
-wire in_guard    = 0;
-wire in_preamble = 0;
+wire in_guard    = 1'b0;
+wire in_preamble = 1'b0;
 
 wire [5:0] control =
   { 1'b0, 1'b0, 1'b0, in_preamble, vsync ^ V_INVERT, hsync ^ H_INVERT };
@@ -82,8 +84,8 @@ CLKDIV #(
 ) clk_div (
   .CLKOUT (clk_pixel),
   .HCLKIN (clk_dvi),
-  //.RESETN(clk_lock)
-  .RESETN (1'b0),
+  .RESETN (clk_lock),
+  //.RESETN (1'b1),
   .CALIB  (1'b1)
 );
 

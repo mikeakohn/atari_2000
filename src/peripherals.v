@@ -86,23 +86,60 @@ reg [7:0] blue;
 wire debug;
 wire in_hblank;
 wire in_vblank;
+wire [9:0] hpos;
+wire [9:0] vpos;
 
-/*
-always @(button_0) begin
-  buttons = { 7'b0, ~button_0 };
+// Original Atari 2600 is 20 * 2 bit playfield.
+// This comes to 640 / 40 = 16 pixels per playfield bit.
+// 720 - 640 = 80 extra pixels (40 on each side).
+// 40 / 16 = 2.5... so just adding 2 extra bits + a border color.
+// Border is 8 pixels.
+reg [21:0] playfield;
+
+always @(posedge clk) begin
+  if (hpos >= 88 + 8) begin
+    if (hpos < 88 + 360) begin
+      if (playfield[hpos[9:4]]) begin
+        red   <= 8'hff;
+        green <= 8'h00;
+        blue  <= 8'h00;
+      end else begin
+        red   <= 8'h00;
+        green <= 8'h00;
+        blue  <= 8'hff;
+      end
+    end else if (hpos < 88 + 720 - 8) begin
+      if (playfield[hpos[0]]) begin
+        red   <= 8'hff;
+        green <= 8'h00;
+        blue  <= 8'h00;
+      end else begin
+        red   <= 8'h00;
+        green <= 8'h00;
+        blue  <= 8'hff;
+      end
+    end
+  end else begin
+    // FIXME: Remove this later.
+    red   <= 8'h00;
+    green <= 8'hff;
+    blue  <= 8'h00;
+  end
 end
-*/
 
 always @(posedge raw_clk) begin
   //if (reset) speaker_value_high <= 0;
 
   if (write_enable) begin
     case (address[5:0])
-      5'h0: red   <= data_in;
-      5'h1: blue  <= data_in;
-      5'h2: green <= data_in;
-      5'hb: begin tx_data <= data_in; tx_strobe <= 1; end
-      5'he: spi_tx_buffer_1[7:0] <= data_in;
+      //5'h00: red   <= data_in;
+      //5'h01: blue  <= data_in;
+      //5'h02: green <= data_in;
+      5'h03: spi_tx_buffer_1[7:0] <= data_in;
+      5'h04: begin tx_data <= data_in; tx_strobe <= 1; end
+      5'h0d: playfield[21:16] <= data_in[2:7];
+      5'h0e: playfield[15:8]  <= data_in[7:0];
+      5'h0f: playfield[7:0]   <= data_in[0:7];
       5'h10: if (data_in[1] == 1) spi_start_1 <= 1;
       5'h11: spi_cs_1 <= data_in;
       5'h12: spi_divisor_1 <= data_in;
@@ -167,6 +204,8 @@ hdmi hdmi_0(
   .dvi_ck_n  (dvi_ck_n),
   .in_hblank (in_hblank),
   .in_vblank (in_vblank),
+  .hpos      (hpos),
+  .vpos      (vpos),
   .red       (red),
   .green     (green),
   .blue      (blue)
