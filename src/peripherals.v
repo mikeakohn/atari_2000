@@ -88,8 +88,9 @@ wire in_hblank;
 wire in_vblank;
 wire [9:0] hpos;
 wire [9:0] vpos;
+wire in_image;
 
-wire [9:0] img_x = hpos > 88 + 8 ? hpos - 88 + 8 : 0;
+//wire [9:0] img_x = hpos > 88 + 8 ? hpos - 88 + 8 : 0;
 
 // Original Atari 2600 is 20 * 2 bit playfield.
 // This comes to 640 / 40 = 16 pixels per playfield bit.
@@ -101,7 +102,12 @@ reg [4:0] playfield_bit = 21;
 reg [4:0] playfield_dir = -1;
 
 always @(posedge raw_clk) begin
-  if (hpos >= 88 + 8) begin
+  if (hpos == 0) begin
+    playfield_dir <= -1;
+    playfield_bit <= 21;
+    //playfield_dir <= 1;
+    //playfield_bit <= 0;
+  end else if (in_image) begin
     if (hpos[3:0] == 0) begin
       if (playfield[playfield_bit]) begin
         red   <= 8'hff;
@@ -119,39 +125,6 @@ always @(posedge raw_clk) begin
         playfield_dir <= 1;
       end
     end
-  end else begin
-    playfield_dir <= -1;
-    playfield_bit <= 21;
-
-/*
-    //if (hpos < 88 + 360) begin
-    if (playfield[img_x[9:4]]) begin
-      if (playfield[playfield_bit]) begin
-        red   <= 8'hff;
-        green <= 8'h00;
-        blue  <= 8'h00;
-      end else begin
-        red   <= 8'h00;
-        green <= 8'h00;
-        blue  <= 8'hff;
-      end
-    end else if (img_x < 720) begin
-      if (playfield[playfield_bit]) begin
-        red   <= 8'hff;
-        green <= 8'h00;
-        blue  <= 8'h00;
-      end else begin
-        red   <= 8'h00;
-        green <= 8'hff;
-        blue  <= 8'h00;
-      end
-    end
-  end else begin
-    // FIXME: Remove this later.
-    red   <= 8'h00;
-    green <= 8'h55;
-    blue  <= 8'h00;
-*/
   end
 end
 
@@ -234,6 +207,7 @@ hdmi hdmi_0(
   .in_vblank (in_vblank),
   .hpos      (hpos),
   .vpos      (vpos),
+  .in_image  (in_image),
   .red       (red),
   .green     (green),
   .blue      (blue)

@@ -23,6 +23,7 @@ module hdmi
   output in_vblank,
   output reg [9:0] hpos,
   output reg [9:0] vpos,
+  output in_image,
   input [7:0] red,
   input [7:0] green,
   input [7:0] blue
@@ -55,7 +56,8 @@ wire clk_lock;
 // v_image, v_front_porch, v_sync, v_back_porch
 //`include "line_ifsb.vinc"
 
-wire in_image    = ~(in_hblank || in_vblank);
+assign in_image    = ~(in_hblank || in_vblank);
+
 //wire in_guard    = !in_vblank && guard_pixel;
 //wire in_preamble = !in_vblank && preamble_pixel;
 //wire in_guard    = guard_pixel;
