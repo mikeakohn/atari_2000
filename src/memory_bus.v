@@ -53,7 +53,6 @@ module memory_bus
 wire [7:0] rom_data_out;
 wire [7:0] ram_data_out;
 wire [7:0] peripherals_data_out;
-//wire [7:0] block_ram_data_out;
 wire [7:0] sd_data_out;
 
 wire [7:0] load_count;
@@ -71,37 +70,31 @@ wire peripherals_write_enable;
 //wire block_ram_write_enable;
 wire flash_rom_enable;
 
-assign ram_write_enable         = (bank == 0 && upper_page == 0) && write_enable;
-assign peripherals_write_enable = (bank == 2 && upper_page == 0) && write_enable;
+assign peripherals_write_enable = (bank == 0 && upper_page == 0) && write_enable;
+assign ram_write_enable         = (bank == 2 && upper_page == 0) && write_enable;
 //assign block_ram_write_enable   = (bank == 3) && write_enable;
+
+// FIXME: The RAM probably need an enable also.
+wire peripherals_enable;
+assign peripherals_enable = (bank == 0 && upper_page == 0) && bus_enable;
 
 // FIXME: bus_enable really should be true here.
 assign flash_rom_enable = (bank == 3 || upper_page != 0) && bus_enable;
 //assign flash_rom_enable = (bank == 3 || upper_page != 0);
 
-// FIXME: The RAM probably need an enable also.
-wire peripherals_enable;
-assign peripherals_enable = (bank == 2 && upper_page == 0) && bus_enable;
-
 // FIXME: This probably shouldn't depend on flash_rom being enabled.
 wire sd_busy;
 assign bus_halt = flash_rom_enable && sd_busy;
-
-// Based on the selected bank of memory (address[14:13]) select if
-// memory should read from ram.v, rom.v, peripherals.v.
-//assign data_out = address[15] == 0 ?
-//  (address[14] == 0 ? ram_data_out         : rom_data_out) :
-//  (address[14] == 0 ? peripherals_data_out : sd_data_out);
 
 always @ * begin
   if (bank == 3 || upper_page != 0) begin
     data_out <= sd_data_out;
   end else if (bank == 0) begin
-    data_out <= ram_data_out;
+    data_out <= peripherals_data_out;
   end else if (bank == 1) begin
     data_out <= rom_data_out;
   end else if (bank == 2) begin
-    data_out <= peripherals_data_out;
+    data_out <= ram_data_out;
   end else begin
     data_out <= 0;
   end
@@ -153,16 +146,6 @@ peripherals peripherals_0(
   .reset        (reset)
 );
 
-/*
-ram ram_1(
-  .address      (address[11:0]),
-  .data_in      (data_in),
-  .data_out     (block_ram_data_out),
-  .write_enable (block_ram_write_enable),
-  .clk          (raw_clk)
-);
-*/
-
 sd_card_sdhc sd_card_0(
   .address     (address[23:0]),
   .data_out    (sd_data_out),
@@ -171,7 +154,6 @@ sd_card_sdhc sd_card_0(
   .spi_clk     (sd_card_clk),
   .spi_do      (sd_card_di),
   .spi_di      (sd_card_do),
-  //.debug       (debug),
   .load_count  (load_count),
   .enable      (flash_rom_enable),
   .clk         (raw_clk),

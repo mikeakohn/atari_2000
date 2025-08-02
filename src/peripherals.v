@@ -80,7 +80,7 @@ wire rx_ready;
 reg  rx_ready_clear = 0;
 
 // Video.
-reg [7:0] red   = 8'h55;
+reg [7:0] red   = 0;
 reg [7:0] green = 0;
 reg [7:0] blue  = 0;
 wire debug;
@@ -89,18 +89,19 @@ wire in_vblank;
 wire [9:0] hpos;
 wire [9:0] vpos;
 
+wire [9:0] img_x = hpos > 88 + 8 ? hpos - 88 + 8 : 0;
+
 // Original Atari 2600 is 20 * 2 bit playfield.
 // This comes to 640 / 40 = 16 pixels per playfield bit.
 // 720 - 640 = 80 extra pixels (40 on each side).
 // 40 / 16 = 2.5... so just adding 2 extra bits + a border color.
 // Border is 8 pixels.
-reg [21:0] playfield;
+reg [21:0] playfield = 22'd22;
 
-/*
 always @(posedge clk) begin
   if (hpos >= 88 + 8) begin
     if (hpos < 88 + 360) begin
-      if (playfield[hpos[9:4]]) begin
+      if (playfield[img_x[9:4]]) begin
         red   <= 8'hff;
         green <= 8'h00;
         blue  <= 8'h00;
@@ -109,25 +110,24 @@ always @(posedge clk) begin
         green <= 8'h00;
         blue  <= 8'hff;
       end
-    end else if (hpos < 88 + 720 - 8) begin
-      if (playfield[hpos[0]]) begin
+    end else if (img_x < 720) begin
+      if (playfield[img_x[0]]) begin
         red   <= 8'hff;
         green <= 8'h00;
         blue  <= 8'h00;
       end else begin
         red   <= 8'h00;
-        green <= 8'h00;
-        blue  <= 8'hff;
+        green <= 8'hff;
+        blue  <= 8'h00;
       end
     end
   end else begin
     // FIXME: Remove this later.
     red   <= 8'h00;
-    green <= 8'hff;
+    green <= 8'h55;
     blue  <= 8'h00;
   end
 end
-*/
 
 always @(posedge raw_clk) begin
   //if (reset) speaker_value_high <= 0;
@@ -195,7 +195,7 @@ uart uart_0
 );
 
 hdmi hdmi_0(
-  .clk       (clk),
+  .clk       (raw_clk),
   .dvi_d0_p  (dvi_d0_p),
   .dvi_d0_n  (dvi_d0_n),
   .dvi_d1_p  (dvi_d1_p),
