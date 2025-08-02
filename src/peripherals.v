@@ -96,12 +96,37 @@ wire [9:0] img_x = hpos > 88 + 8 ? hpos - 88 + 8 : 0;
 // 720 - 640 = 80 extra pixels (40 on each side).
 // 40 / 16 = 2.5... so just adding 2 extra bits + a border color.
 // Border is 8 pixels.
-reg [21:0] playfield = 22'd22;
+reg [21:0] playfield    = 12;
+reg [4:0] playfield_bit = 21;
+reg [4:0] playfield_dir = -1;
 
-always @(posedge clk) begin
+always @(posedge raw_clk) begin
   if (hpos >= 88 + 8) begin
-    if (hpos < 88 + 360) begin
-      if (playfield[img_x[9:4]]) begin
+    if (hpos[3:0] == 0) begin
+      if (playfield[playfield_bit]) begin
+        red   <= 8'hff;
+        green <= 8'h00;
+        blue  <= 8'h00;
+      end else begin
+        red   <= 8'h00;
+        green <= 8'h00;
+        blue  <= 8'hff;
+      end
+
+      playfield_bit <= playfield_bit + playfield_dir;
+
+      if (playfield_bit == 0) begin
+        playfield_dir <= 1;
+      end
+    end
+  end else begin
+    playfield_dir <= -1;
+    playfield_bit <= 21;
+
+/*
+    //if (hpos < 88 + 360) begin
+    if (playfield[img_x[9:4]]) begin
+      if (playfield[playfield_bit]) begin
         red   <= 8'hff;
         green <= 8'h00;
         blue  <= 8'h00;
@@ -111,7 +136,7 @@ always @(posedge clk) begin
         blue  <= 8'hff;
       end
     end else if (img_x < 720) begin
-      if (playfield[img_x[0]]) begin
+      if (playfield[playfield_bit]) begin
         red   <= 8'hff;
         green <= 8'h00;
         blue  <= 8'h00;
@@ -126,6 +151,7 @@ always @(posedge clk) begin
     red   <= 8'h00;
     green <= 8'h55;
     blue  <= 8'h00;
+*/
   end
 end
 
