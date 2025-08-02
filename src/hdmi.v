@@ -24,6 +24,7 @@ module hdmi
   output reg [9:0] hpos,
   output reg [9:0] vpos,
   output in_image,
+  output clk_pixel,
   input [7:0] red,
   input [7:0] green,
   input [7:0] blue
@@ -32,7 +33,6 @@ module hdmi
 //reg [9:0] hpos = 0;
 //reg [9:0] vpos = 0;
 
-wire clk_pixel;
 wire clk_dvi;
 wire clk_lock;
 

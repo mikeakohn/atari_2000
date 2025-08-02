@@ -89,6 +89,9 @@ wire in_vblank;
 wire [9:0] hpos;
 wire [9:0] vpos;
 wire in_image;
+wire clk_pixel;
+
+wire is_fg = playfield[playfield_bit];
 
 //wire [9:0] img_x = hpos > 88 + 8 ? hpos - 88 + 8 : 0;
 
@@ -97,19 +100,18 @@ wire in_image;
 // 720 - 640 = 80 extra pixels (40 on each side).
 // 40 / 16 = 2.5... so just adding 2 extra bits + a border color.
 // Border is 8 pixels.
-reg [21:0] playfield    = 12;
+reg [21:0] playfield    = 0;
 reg [4:0] playfield_bit = 21;
 reg [4:0] playfield_dir = -1;
 
-always @(posedge raw_clk) begin
-  if (hpos == 0) begin
+always @(posedge clk_pixel) begin
+  if (hpos < 80) begin
     playfield_dir <= -1;
     playfield_bit <= 21;
-    //playfield_dir <= 1;
-    //playfield_bit <= 0;
   end else if (in_image) begin
     if (hpos[3:0] == 0) begin
-      if (playfield[playfield_bit]) begin
+      //if (hpos > 300) begin
+      if (is_fg) begin
         red   <= 8'hff;
         green <= 8'h00;
         blue  <= 8'h00;
@@ -208,6 +210,7 @@ hdmi hdmi_0(
   .hpos      (hpos),
   .vpos      (vpos),
   .in_image  (in_image),
+  .clk_pixel (clk_pixel),
   .red       (red),
   .green     (green),
   .blue      (blue)

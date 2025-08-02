@@ -417,9 +417,9 @@ end
 
 // This block is the main CPU instruction execute state machine.
 always @(posedge clk) begin
-  if (!button_reset)
+  if (button_reset)
     state <= STATE_RESET;
-  else if (!button_halt)
+  else if (button_halt)
     state <= STATE_HALTED;
   else if (mem_bus_halted == 0)
     case (state)
