@@ -28,18 +28,18 @@ always @(posedge clk) begin
   if (count == WAIT_TIME) begin
     count <= 0;
     leds_value <= leds_value + 1;
-
-    if (vpos < 250) begin
-      red   <= 255;
-      green <= 0;
-      blue  <= 0;
-    end else begin
-      red   <= 0;
-      green <= 0;
-      blue  <= 255;
-    end
   end else begin
     count <= count + 1;
+  end
+
+  if (vpos < 250) begin
+    red   <= 255;
+    green <= 0;
+    blue  <= 0;
+  end else begin
+    red   <= 0;
+    green <= 0;
+    blue  <= 255;
   end
 end
 
