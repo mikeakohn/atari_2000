@@ -1,0 +1,46 @@
+
+IO_LOC "clk" 4;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+CLOCK_LOC "clk" BUFG;
+
+IO_LOC "leds[0]" 15;
+IO_LOC "leds[1]" 16;
+IO_LOC "leds[2]" 17;
+IO_LOC "leds[3]" 18;
+IO_LOC "leds[4]" 19;
+IO_LOC "leds[5]" 20;
+
+// HDMI data pins.
+//IO_LOC "dvi_ck_p"   33,34;
+//IO_LOC "dvi_d_p[0]" 35,36;
+//IO_LOC "dvi_d_p[1]" 37,38;
+//IO_LOC "dvi_d_p[2]" 39,40;
+
+//IO_PORT "dvi_ck_p"   PULL_MODE=NONE DRIVE=8;
+//IO_PORT "dvi_d_p[0]" PULL_MODE=NONE DRIVE=8;
+//IO_PORT "dvi_d_p[1]" PULL_MODE=NONE DRIVE=8;
+//IO_PORT "dvi_d_p[2]" PULL_MODE=NONE DRIVE=8;
+
+IO_LOC "dvi_ck_p" 33;
+IO_LOC "dvi_ck_n" 34;
+
+IO_PORT "dvi_ck_p" PULL_MODE=NONE DRIVE=8;
+IO_PORT "dvi_ck_n" PULL_MODE=NONE DRIVE=8;
+
+IO_LOC "dvi_d0_p" 35;
+IO_LOC "dvi_d0_n" 36;
+IO_LOC "dvi_d1_p" 37;
+IO_LOC "dvi_d1_n" 38;
+IO_LOC "dvi_d2_p" 39;
+IO_LOC "dvi_d2_n" 40;
+
+IO_PORT "dvi_d0_p" PULL_MODE=NONE DRIVE=8;
+IO_PORT "dvi_d0_n" PULL_MODE=NONE DRIVE=8;
+IO_PORT "dvi_d1_p" PULL_MODE=NONE DRIVE=8;
+IO_PORT "dvi_d1_n" PULL_MODE=NONE DRIVE=8;
+IO_PORT "dvi_d2_p" PULL_MODE=NONE DRIVE=8;
+IO_PORT "dvi_d2_n" PULL_MODE=NONE DRIVE=8;
+
+// Hot plug detect.
+IO_LOC "dvi_hpd" 26;
+

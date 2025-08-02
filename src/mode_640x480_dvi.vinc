@@ -1,7 +1,7 @@
 
-// 640 (800x525) 25.175MHz
+// 640x480 (800x525) 25.175MHz
 parameter WIDTH         = 800;
-parameter HEIGHT        = 640;
+parameter HEIGHT        = 525;
 
 parameter H_BACK_PORCH  = 48;
 parameter H_IMAGE       = 640;
@@ -15,6 +15,10 @@ parameter V_FRONT_PORCH = 10;
 parameter V_SYNC        = 2;
 parameter V_INVERT      = 1'b1;
 
+// GW2AR-LV18QN88C8/I7
+// PFD = FCLKIN / (IDIV_SEL+1)
+// CLKOUT = FCLKIN * (FBDIV_SEL+1) / (IDIV_SEL+1)
+// VCO = (FCLKIN * (FBDIV_SEL+1) * ODIV_SEL) / (IDIV_SEL+1)
 // For GW1NR-9C C6/I5 (Tang Nano 9K proto dev board).
 rPLL #(
   .FCLKIN    ("27"),

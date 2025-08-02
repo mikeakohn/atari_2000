@@ -80,9 +80,9 @@ wire rx_ready;
 reg  rx_ready_clear = 0;
 
 // Video.
-reg [7:0] red;
-reg [7:0] green;
-reg [7:0] blue;
+reg [7:0] red   = 8'h55;
+reg [7:0] green = 0;
+reg [7:0] blue  = 0;
 wire debug;
 wire in_hblank;
 wire in_vblank;
@@ -96,6 +96,7 @@ wire [9:0] vpos;
 // Border is 8 pixels.
 reg [21:0] playfield;
 
+/*
 always @(posedge clk) begin
   if (hpos >= 88 + 8) begin
     if (hpos < 88 + 360) begin
@@ -126,6 +127,7 @@ always @(posedge clk) begin
     blue  <= 8'h00;
   end
 end
+*/
 
 always @(posedge raw_clk) begin
   //if (reset) speaker_value_high <= 0;
