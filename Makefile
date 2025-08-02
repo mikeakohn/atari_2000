@@ -37,5 +37,6 @@ blink:
 
 clean:
 	@rm -f $(PROGRAM).bin $(PROGRAM).json $(PROGRAM).asc *.lst
+	@rm -f $(PROGRAM)_pnr.json
 	@echo "Clean!"
 

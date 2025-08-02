@@ -23,7 +23,7 @@ program:
 
 clean:
 	@rm -f $(PROGRAM).bin $(PROGRAM).json $(PROGRAM).asc *.lst
-	@rm -f blink.bin load_byte.bin store_byte.bin test_subroutine.bin
+	@rm -f $(PROGRAM)_pnr.json
 	@rm -f button.bin
 	@echo "Clean!"
 
