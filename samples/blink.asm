@@ -17,11 +17,14 @@ start:
   ; Set X/Y to 32 bit.
   rep #0x10
 
-  lda #0x8c
+  ;;        pf0    pf1      pf2
+  ;; pf = 110001 00000001 00000011
+
+  lda.b #0x8c
   sta 0x0d
-  lda #0x01
+  lda.b #0x01
   sta 0x0e
-  lda #0xc0
+  lda.b #0xc0
   sta 0x0f
 
 loop:

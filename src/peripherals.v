@@ -105,7 +105,7 @@ reg [4:0] playfield_bit = 21;
 reg [4:0] playfield_dir = -1;
 
 always @(posedge clk_pixel) begin
-  if (hpos < 80) begin
+  if (hpos < 88) begin
     playfield_dir <= -1;
     playfield_bit <= 21;
   end else if (in_image) begin
