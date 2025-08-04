@@ -80,9 +80,10 @@ wire rx_ready;
 reg  rx_ready_clear = 0;
 
 // Video.
-reg [7:0] red   = 0;
-reg [7:0] green = 0;
-reg [7:0] blue  = 0;
+//reg [7:0] red   = 0;
+//reg [7:0] green = 0;
+//reg [7:0] blue  = 0;
+reg [6:0] color = 0;
 wire debug;
 wire in_hblank;
 wire in_vblank;
@@ -105,17 +106,20 @@ reg [4:0] playfield_bit = 21;
 reg [4:0] playfield_dir = -1;
 
 always @(posedge clk_pixel) begin
-  if (hpos >=8 && in_image) begin
+  //if (hpos >=8 && in_image) begin
+  if (in_image) begin
     if (hpos[3:0] == 0) begin
       //if (hpos > 300) begin
       if (is_fg) begin
-        red   <= 8'hff;
-        green <= 8'h00;
-        blue  <= 8'h00;
+        color <= 7'h0c;
+        //red   <= 8'hff;
+        //green <= 8'h00;
+        //blue  <= 8'h00;
       end else begin
-        red   <= 8'h00;
-        green <= 8'h00;
-        blue  <= 8'hff;
+        color <= 7'h4c;
+        //red   <= 8'h00;
+        //green <= 8'h00;
+        //blue  <= 8'hff;
       end
 
       playfield_bit <= playfield_bit + playfield_dir;
@@ -127,9 +131,10 @@ always @(posedge clk_pixel) begin
   end else begin
     playfield_dir <= -1;
     playfield_bit <= 21;
-    red   <= 0;
-    green <= 0;
-    blue  <= 0;
+    //red   <= 0;
+    //green <= 0;
+    //blue  <= 0;
+    color <= 0;
   end
 end
 
@@ -224,9 +229,10 @@ hdmi hdmi_0(
   .vpos      (vpos),
   .in_image  (in_image),
   .clk_pixel (clk_pixel),
-  .red       (red),
-  .green     (green),
-  .blue      (blue)
+  .color     (color)
+  //.red       (red),
+  //.green     (green),
+  //.blue      (blue)
 );
 
 endmodule

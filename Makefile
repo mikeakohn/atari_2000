@@ -3,6 +3,7 @@ PROGRAM=atari_2000
 SOURCE= \
   src/$(PROGRAM).v \
   src/addressing_mode.v \
+  src/color_table.v \
   src/encode_8b10b.v \
   src/hdmi.v \
   src/memory_bus.v \

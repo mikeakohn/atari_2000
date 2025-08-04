@@ -18,16 +18,16 @@ module hdmi
   output dvi_d2_n,
   output dvi_ck_p,
   output dvi_ck_n,
-  output debug,
   output in_hblank,
   output in_vblank,
   output reg [9:0] hpos,
   output reg [9:0] vpos,
   output in_image,
   output clk_pixel,
-  input [7:0] red,
-  input [7:0] green,
-  input [7:0] blue
+  input [6:0] color
+  //input [7:0] red,
+  //input [7:0] green,
+  //input [7:0] blue
 );
 
 //reg [9:0] hpos = 0;
@@ -68,16 +68,6 @@ wire in_preamble = 1'b0;
 wire [5:0] control =
   { 1'b0, 1'b0, 1'b0, in_preamble, vsync ^ V_INVERT, hsync ^ H_INVERT };
 
-assign debug = in_image;
-
-wire [9:0] tmds_0;
-wire [9:0] tmds_1;
-wire [9:0] tmds_2;
-
-wire tmds_bit_0;
-wire tmds_bit_1;
-wire tmds_bit_2;
-
 wire reset = 0;
 
 CLKDIV #(
@@ -89,6 +79,66 @@ CLKDIV #(
   .RESETN (clk_lock),
   //.RESETN (1'b1),
   .CALIB  (1'b1)
+);
+
+always @(posedge clk_pixel) begin
+  // Horizontal beam is 858 pixels.
+  // Vertical   beam is 525 pixels
+  if (hpos == WIDTH - 1) begin
+    hpos <= 0;
+    vpos <= vpos == HEIGHT - 1 ? 0 : vpos + 1;
+  end else begin
+    hpos <= hpos + 1;
+  end
+end
+
+wire [7:0] red;
+wire [7:0] green;
+wire [7:0] blue;
+
+color_table color_table_0(
+  .color (color),
+  .red   (red),
+  .green (green),
+  .blue  (blue)
+);
+
+wire [9:0] tmds_0;
+wire [9:0] tmds_1;
+wire [9:0] tmds_2;
+
+wire tmds_bit_0;
+wire tmds_bit_1;
+wire tmds_bit_2;
+
+encode_8b10b tmds_encode_0(
+  .channel     (2'd0),
+  .clk         (clk_pixel),
+  .data        (blue),
+  .in_image    (in_image),
+  .in_guard    (in_guard),
+  .control     (control[1:0]),
+  .tmds        (tmds_0)
+);
+
+encode_8b10b tmds_encode_1(
+  .channel     (2'd1),
+  .clk         (clk_pixel),
+  .data        (green),
+  .in_image    (in_image),
+  .in_guard    (in_guard),
+  .control     (control[3:2]),
+  .tmds        (tmds_1)
+);
+
+encode_8b10b tmds_encode_2(
+  .channel     (2'd2),
+  .clk         (clk_pixel),
+  .data        (red),
+  .in_image    (in_image),
+  .in_guard    (in_guard),
+  .control     (control[5:4]),
+  .tmds        (tmds_2)
 );
 
 OSER10 ser10_tmds_0(
@@ -155,47 +205,6 @@ ELVDS_OBUF tmds_bufds [3:0](
   .OB ( { dvi_ck_n, dvi_d0_n,   dvi_d1_n,   dvi_d2_n   } )
 );
 */
-
-always @(posedge clk_pixel) begin
-  // Horizontal beam is 858 pixels.
-  // Vertical   beam is 525 pixels
-  if (hpos == WIDTH - 1) begin
-    hpos <= 0;
-    vpos <= vpos == HEIGHT - 1 ? 0 : vpos + 1;
-  end else begin
-    hpos <= hpos + 1;
-  end
-end
-
-encode_8b10b tmds_encode_0(
-  .channel     (2'd0),
-  .clk         (clk_pixel),
-  .data        (blue),
-  .in_image    (in_image),
-  .in_guard    (in_guard),
-  .control     (control[1:0]),
-  .tmds        (tmds_0)
-);
-
-encode_8b10b tmds_encode_1(
-  .channel     (2'd1),
-  .clk         (clk_pixel),
-  .data        (green),
-  .in_image    (in_image),
-  .in_guard    (in_guard),
-  .control     (control[3:2]),
-  .tmds        (tmds_1)
-);
-
-encode_8b10b tmds_encode_2(
-  .channel     (2'd2),
-  .clk         (clk_pixel),
-  .data        (red),
-  .in_image    (in_image),
-  .in_guard    (in_guard),
-  .control     (control[5:4]),
-  .tmds        (tmds_2)
-);
 
 endmodule
 
