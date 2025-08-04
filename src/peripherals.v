@@ -105,10 +105,7 @@ reg [4:0] playfield_bit = 21;
 reg [4:0] playfield_dir = -1;
 
 always @(posedge clk_pixel) begin
-  if (hpos < 88) begin
-    playfield_dir <= -1;
-    playfield_bit <= 21;
-  end else if (in_image) begin
+  if (hpos >=8 && in_image) begin
     if (hpos[3:0] == 0) begin
       //if (hpos > 300) begin
       if (is_fg) begin
@@ -127,6 +124,12 @@ always @(posedge clk_pixel) begin
         playfield_dir <= 1;
       end
     end
+  end else begin
+    playfield_dir <= -1;
+    playfield_bit <= 21;
+    red   <= 0;
+    green <= 0;
+    blue  <= 0;
   end
 end
 
@@ -140,9 +143,19 @@ always @(posedge raw_clk) begin
       //5'h02: green <= data_in;
       5'h03: spi_tx_buffer_1[7:0] <= data_in;
       5'h04: begin tx_data <= data_in; tx_strobe <= 1; end
-      5'h0d: playfield[21:16] <= data_in[2:7];
-      5'h0e: playfield[15:8]  <= data_in[7:0];
-      5'h0f: playfield[7:0]   <= data_in[0:7];
+      5'h0d:
+        playfield[21:16] <=
+        {
+                                  data_in[2], data_in[3],
+          data_in[4], data_in[5], data_in[6], data_in[7]
+        };
+      5'h0e: playfield[15:8] <= data_in[7:0];
+      5'h0f:
+        playfield[7:0] <=
+        {
+          data_in[0], data_in[1], data_in[2], data_in[3],
+          data_in[4], data_in[5], data_in[6], data_in[7]
+        };
       5'h10: if (data_in[1] == 1) spi_start_1 <= 1;
       5'h11: spi_cs_1 <= data_in;
       5'h12: spi_divisor_1 <= data_in;

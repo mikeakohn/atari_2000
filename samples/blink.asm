@@ -20,11 +20,18 @@ start:
   ;;        pf0    pf1      pf2
   ;; pf = 110001 00000001 00000011
 
-  lda.b #0x8c
+  ;lda.b #0x8c
+  ;sta 0x0d
+  ;lda.b #0x01
+  ;sta 0x0e
+  ;lda.b #0xc0
+  ;sta 0x0f
+
+  lda.b #0x04
   sta 0x0d
-  lda.b #0x01
+  lda.b #0x00
   sta 0x0e
-  lda.b #0xc0
+  lda.b #0x80
   sta 0x0f
 
 loop:

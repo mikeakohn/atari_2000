@@ -46,7 +46,7 @@ wire clk_lock;
 
 // h_back_porch, h_image, h_front_porch, h_sync
 // v_back_porch, v_image, v_front_porch, v_sync
-`include "line_bifs.vinc"
+//`include "line_bifs.vinc"
 
 // h_front_porch, h_sync, h_back_porch, h_image
 // v_front_porch, v_sync, v_back_porch, v_image
@@ -54,7 +54,7 @@ wire clk_lock;
 
 // h_image, h_front_porch, h_sync, h_back_porch
 // v_image, v_front_porch, v_sync, v_back_porch
-//`include "line_ifsb.vinc"
+`include "line_ifsb.vinc"
 
 assign in_image    = ~(in_hblank || in_vblank);
 
