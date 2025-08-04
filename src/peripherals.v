@@ -37,6 +37,7 @@ module peripherals
   output dvi_d2_n,
   output dvi_ck_p,
   output dvi_ck_n,
+  output reg wait_hblank = 0,
   input reset
 );
 
@@ -80,17 +81,14 @@ wire rx_ready;
 reg  rx_ready_clear = 0;
 
 // Video.
-//reg [7:0] red   = 0;
-//reg [7:0] green = 0;
-//reg [7:0] blue  = 0;
 reg [6:0] color = 0;
-wire debug;
 wire in_hblank;
 wire in_vblank;
 wire [9:0] hpos;
 wire [9:0] vpos;
 wire in_image;
 wire clk_pixel;
+reg wait_until_image = 0;
 
 wire is_fg = playfield[playfield_bit];
 
@@ -105,21 +103,19 @@ reg [21:0] playfield    = 0;
 reg [4:0] playfield_bit = 21;
 reg [4:0] playfield_dir = -1;
 
+reg [6:0] color_p0;
+reg [6:0] color_p1;
+reg [6:0] color_fg;
+reg [6:0] color_bg;
+
 always @(posedge clk_pixel) begin
   //if (hpos >=8 && in_image) begin
   if (in_image) begin
     if (hpos[3:0] == 0) begin
-      //if (hpos > 300) begin
       if (is_fg) begin
-        color <= 7'h0c;
-        //red   <= 8'hff;
-        //green <= 8'h00;
-        //blue  <= 8'h00;
+        color <= color_fg;
       end else begin
-        color <= 7'h4c;
-        //red   <= 8'h00;
-        //green <= 8'h00;
-        //blue  <= 8'hff;
+        color <= color_bg;
       end
 
       playfield_bit <= playfield_bit + playfield_dir;
@@ -131,9 +127,6 @@ always @(posedge clk_pixel) begin
   end else begin
     playfield_dir <= -1;
     playfield_bit <= 21;
-    //red   <= 0;
-    //green <= 0;
-    //blue  <= 0;
     color <= 0;
   end
 end
@@ -143,11 +136,17 @@ always @(posedge raw_clk) begin
 
   if (write_enable) begin
     case (address[5:0])
-      //5'h00: red   <= data_in;
-      //5'h01: blue  <= data_in;
-      //5'h02: green <= data_in;
+      5'h02:
+        begin
+          wait_hblank <= 1;
+          if (in_hblank) wait_until_image <= 1;
+        end
       5'h03: spi_tx_buffer_1[7:0] <= data_in;
       5'h04: begin tx_data <= data_in; tx_strobe <= 1; end
+      5'h06: color_p0 <= data_in[7:1];
+      5'h07: color_p1 <= data_in[7:1];
+      5'h08: color_fg <= data_in[7:1];
+      5'h09: color_bg <= data_in[7:1];
       5'h0d:
         playfield[21:16] <=
         {
@@ -171,17 +170,23 @@ always @(posedge raw_clk) begin
 
     if (rx_ready_clear == 1) rx_ready_clear <= 0;
 
+    if (in_hblank)
+      if (wait_until_image == 0) wait_hblank <= 0;
+
+    if (!in_hblank)
+      wait_until_image <= 0;
+
     if (enable) begin
       case (address[5:0])
-        //6'h0: data_out <= buttons;
-        6'hc: begin data_out <= rx_data; rx_ready_clear <= 1; end
-        6'hd: data_out <= { rx_ready, tx_busy };
-        6'he: data_out <= spi_tx_buffer_1[7:0];
-        6'hf: data_out <= spi_rx_buffer_1[7:0];
-        6'h10: data_out <= { 1'b0, spi_busy_1 || spi_start_1 };
-        6'h11: data_out <= spi_cs_1;
-        6'h12: data_out <= spi_divisor_1;
-        6'h13: data_out <= load_count;
+        //5'h0: data_out <= buttons;
+        5'hc: begin data_out <= rx_data; rx_ready_clear <= 1; end
+        5'hd: data_out <= { rx_ready, tx_busy };
+        5'he: data_out <= spi_tx_buffer_1[7:0];
+        5'hf: data_out <= spi_rx_buffer_1[7:0];
+        5'h10: data_out <= { 1'b0, spi_busy_1 || spi_start_1 };
+        5'h11: data_out <= spi_cs_1;
+        5'h12: data_out <= spi_divisor_1;
+        5'h13: data_out <= load_count;
       endcase
     end
   end

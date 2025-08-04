@@ -3,7 +3,7 @@
 // v_image, v_front_porch, v_sync, v_back_porch
 
 assign in_hblank = hpos > H_IMAGE;
-assign in_vblank = vpos > V_IMAGE;
+assign in_vblank = vpos >= V_IMAGE;
 wire guard_pixel = hpos >= H_IMAGE + H_FRONT_PORCH + H_SYNC + H_BACK_PORCH - 2;
 wire preamble_pixel =
   hpos >= H_IMAGE + H_FRONT_PORCH + H_SYNC + H_BACK_PORCH - 10 &&

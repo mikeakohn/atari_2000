@@ -82,9 +82,9 @@ assign peripherals_enable = (bank == 0 && upper_page == 0) && bus_enable;
 assign flash_rom_enable = (bank == 3 || upper_page != 0) && bus_enable;
 //assign flash_rom_enable = (bank == 3 || upper_page != 0);
 
-// FIXME: This probably shouldn't depend on flash_rom being enabled.
+wire wait_hblank;
 wire sd_busy;
-assign bus_halt = flash_rom_enable && sd_busy;
+assign bus_halt = (flash_rom_enable && sd_busy) || wait_hblank;
 
 always @ * begin
   if (bank == 3 || upper_page != 0) begin
@@ -109,9 +109,9 @@ ram ram_0(
 );
 
 rom rom_0(
-  .address   (address[11:0]),
-  .data_out  (rom_data_out),
-  .clk   (raw_clk)
+  .address  (address[11:0]),
+  .data_out (rom_data_out),
+  .clk      (raw_clk)
 );
 
 peripherals peripherals_0(
@@ -143,6 +143,7 @@ peripherals peripherals_0(
   .dvi_d2_n     (dvi_d2_n),
   .dvi_ck_p     (dvi_ck_p),
   .dvi_ck_n     (dvi_ck_n),
+  .wait_hblank  (wait_hblank),
   .reset        (reset)
 );
 

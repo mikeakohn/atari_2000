@@ -421,7 +421,7 @@ always @(posedge clk) begin
     state <= STATE_RESET;
   else if (button_halt)
     state <= STATE_HALTED;
-  else if (mem_bus_halted == 0)
+  else if (mem_bus_halted == 0 || mem_bus_enable == 1)
     case (state)
       STATE_RESET:
         begin
