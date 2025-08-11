@@ -41,7 +41,10 @@ start:
   sta 0x09
 
 loop:
-  lda.b #0x4e
+  lda.b #0x04
+  sta 0x0d
+
+  lda.b #0xfe
   sta 0x08
 
   sta 0x02
@@ -68,11 +71,19 @@ loop:
   sta 0x02
   sta 0x02
 
-  ldx.l #500 - 15
-repeat:
-  sta 0x02
-  dex
-  bne repeat
+  lda.b #0x00
+  sta 0x08
+
+  lda.b #0x20
+  sta 0x0d
+
+  sta 0x00
+
+;  ldx.l #500 - 15
+;repeat:
+;  sta 0x02
+;  dex
+;  bne repeat
 
   jmp loop
 

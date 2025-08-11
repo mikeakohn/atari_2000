@@ -37,7 +37,7 @@ module peripherals
   output dvi_d2_n,
   output dvi_ck_p,
   output dvi_ck_n,
-  output reg wait_hblank = 0,
+  output wait_video,
   input reset
 );
 
@@ -88,7 +88,12 @@ wire [9:0] hpos;
 wire [9:0] vpos;
 wire in_image;
 wire clk_pixel;
-reg wait_until_image = 0;
+reg wait_image_h = 0;
+reg wait_image_v = 0;
+reg wait_hblank = 0;
+reg wait_vblank = 0;
+
+assign wait_video = wait_hblank || wait_vblank;
 
 wire is_fg = playfield[playfield_bit];
 
@@ -136,10 +141,15 @@ always @(posedge raw_clk) begin
 
   if (write_enable) begin
     case (address[5:0])
+      5'h00:
+        begin
+          wait_vblank <= 1;
+          if (in_vblank) wait_image_v <= 1;
+        end
       5'h02:
         begin
           wait_hblank <= 1;
-          if (in_hblank) wait_until_image <= 1;
+          if (in_hblank) wait_image_h <= 1;
         end
       5'h03: spi_tx_buffer_1[7:0] <= data_in;
       5'h04: begin tx_data <= data_in; tx_strobe <= 1; end
@@ -170,11 +180,16 @@ always @(posedge raw_clk) begin
 
     if (rx_ready_clear == 1) rx_ready_clear <= 0;
 
-    if (in_hblank)
-      if (wait_until_image == 0) wait_hblank <= 0;
+    if (in_hblank) begin
+      if (wait_image_h == 0) wait_hblank <= 0;
+    end
 
-    if (!in_hblank)
-      wait_until_image <= 0;
+    if (in_vblank) begin
+      if (wait_image_v == 0) wait_vblank <= 0;
+    end
+
+    if (!in_hblank) wait_image_h <= 0;
+    if (!in_vblank) wait_image_v <= 0;
 
     if (enable) begin
       case (address[5:0])

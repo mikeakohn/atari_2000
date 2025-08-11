@@ -82,9 +82,9 @@ assign peripherals_enable = (bank == 0 && upper_page == 0) && bus_enable;
 assign flash_rom_enable = (bank == 3 || upper_page != 0) && bus_enable;
 //assign flash_rom_enable = (bank == 3 || upper_page != 0);
 
-wire wait_hblank;
+wire wait_video;
 wire sd_busy;
-assign bus_halt = (flash_rom_enable && sd_busy) || wait_hblank;
+assign bus_halt = (flash_rom_enable && sd_busy) || wait_video;
 
 always @ * begin
   if (bank == 3 || upper_page != 0) begin
@@ -143,7 +143,7 @@ peripherals peripherals_0(
   .dvi_d2_n     (dvi_d2_n),
   .dvi_ck_p     (dvi_ck_p),
   .dvi_ck_n     (dvi_ck_n),
-  .wait_hblank  (wait_hblank),
+  .wait_video   (wait_video),
   .reset        (reset)
 );
 
