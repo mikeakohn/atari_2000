@@ -2,6 +2,7 @@
 PROGRAM=blink
 SOURCE= \
   src/$(PROGRAM).v \
+  ../src/color_table.v \
   ../src/encode_8b10b.v \
   ../src/hdmi.v
 

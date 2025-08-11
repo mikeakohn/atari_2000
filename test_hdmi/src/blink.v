@@ -24,7 +24,11 @@ reg [7:0] blue;
 wire [9:0] hpos;
 wire [9:0] vpos;
 
-always @(posedge clk) begin
+wire in_image;
+wire clk_pixel;
+reg [7:0] color;
+
+always @(posedge clk_pixel) begin
   if (count == WAIT_TIME) begin
     count <= 0;
     leds_value <= leds_value + 1;
@@ -33,23 +37,25 @@ always @(posedge clk) begin
   end
 
   if (vpos < 250) begin
-    red   <= 255;
-    green <= 0;
-    blue  <= 0;
+    color <= 8'h2e;
+    //red   <= 255;
+    //green <= 0;
+    //blue  <= 0;
   end else begin
-    red   <= 0;
-    green <= 0;
-    blue  <= 255;
+    color <= 8'h6a;
+    //red   <= 0;
+    //green <= 0;
+    //blue  <= 255;
   end
 end
 
 assign leds[2:0] = ~leds_value;
 
-wire debug;
+//wire debug;
 wire in_hblank;
 wire in_vblank;
 
-assign leds[3] = ~debug;
+assign leds[3] = ~in_image;
 assign leds[4] = ~in_hblank;
 assign leds[5] = ~in_vblank;
 
@@ -63,14 +69,17 @@ hdmi hdmi_0(
   .dvi_d2_n  (dvi_d2_n),
   .dvi_ck_p  (dvi_ck_p),
   .dvi_ck_n  (dvi_ck_n),
-  .debug     (debug),
+  //.debug     (debug),
   .in_hblank (in_hblank),
   .in_vblank (in_vblank),
   .hpos      (hpos),
   .vpos      (vpos),
-  .red       (red),
-  .green     (green),
-  .blue      (blue)
+  .in_image  (in_image),
+  .clk_pixel (clk_pixel),
+  .color     (color[7:1]),
+  //.red       (red),
+  //.green     (green),
+  //.blue      (blue)
 );
 
 endmodule
