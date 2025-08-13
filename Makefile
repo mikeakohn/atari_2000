@@ -33,7 +33,7 @@ program:
 	iceFUNprog $(PROGRAM).bin
 
 blink:
-	naken_asm -l -type bin -o rom.bin samples/blink.asm
+	naken_asm -l -type bin -o rom.bin -Isamples samples/blink.asm
 	python3 tools/bin2txt.py rom.bin > rom.txt
 
 clean:

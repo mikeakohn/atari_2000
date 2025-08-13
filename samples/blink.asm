@@ -1,5 +1,7 @@
 .65832
 
+.include "registers.inc"
+
 .org 0x4000
 start:
   ; Set 65C816 mode.
@@ -31,57 +33,57 @@ start:
   ;; pf = 100000 00000000 00000001
 
   lda.b #0x04
-  sta 0x0d
+  sta pf0
   lda.b #0x00
-  sta 0x0e
+  sta pf1
   lda.b #0x80
-  sta 0x0f
+  sta pf2
 
   lda.b #0x8a
-  sta 0x09
+  sta colubk
 
 loop:
   lda.b #0x04
-  sta 0x0d
+  sta pf0
 
   lda.b #0xfe
-  sta 0x08
+  sta colupf
 
-  sta 0x02
-  sta 0x02
-  sta 0x02
-  sta 0x02
-  sta 0x02
+  sta wsync
+  sta wsync
+  sta wsync
+  sta wsync
+  sta wsync
 
   lda.b #0xf2
-  sta 0x08
+  sta colupf
 
-  sta 0x02
-  sta 0x02
-  sta 0x02
-  sta 0x02
-  sta 0x02
+  sta wsync
+  sta wsync
+  sta wsync
+  sta wsync
+  sta wsync
 
   lda.b #0x1e
-  sta 0x08
+  sta colupf
 
-  sta 0x02
-  sta 0x02
-  sta 0x02
-  sta 0x02
-  sta 0x02
+  sta wsync
+  sta wsync
+  sta wsync
+  sta wsync
+  sta wsync
 
   lda.b #0x00
-  sta 0x08
+  sta colupf
 
   lda.b #0x20
-  sta 0x0d
+  sta pf0
 
-  sta 0x00
+  sta vsync
 
 ;  ldx.l #500 - 15
 ;repeat:
-;  sta 0x02
+;  sta wsync
 ;  dex
 ;  bne repeat
 
