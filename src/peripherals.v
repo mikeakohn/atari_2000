@@ -144,7 +144,9 @@ always @(posedge raw_clk) begin
       5'h00:
         begin
           wait_vblank <= 1;
-          if (in_vblank) wait_image_v <= 1;
+          if (!in_vblank) wait_image_v <= 1;
+          //wait_vblank <= 0;
+          //if (!in_vblank) wait_image_v <= 0;
         end
       5'h02:
         begin
@@ -184,12 +186,14 @@ always @(posedge raw_clk) begin
       if (wait_image_h == 0) wait_hblank <= 0;
     end
 
-    if (in_vblank) begin
+    if (!in_vblank) begin
       if (wait_image_v == 0) wait_vblank <= 0;
     end
 
+    if (vpos == 0) wait_vblank <= 0;
+
     if (!in_hblank) wait_image_h <= 0;
-    if (!in_vblank) wait_image_v <= 0;
+    if (in_vblank)  wait_image_v <= 0;
 
     if (enable) begin
       case (address[5:0])
