@@ -36,6 +36,10 @@ blink:
 	naken_asm -l -type bin -o rom.bin -Isamples samples/blink.asm
 	python3 tools/bin2txt.py rom.bin > rom.txt
 
+full_screen:
+	naken_asm -l -type bin -o rom.bin -Isamples samples/full_screen.asm
+	python3 tools/bin2txt.py rom.bin > rom.txt
+
 clean:
 	@rm -f $(PROGRAM).bin $(PROGRAM).json $(PROGRAM).asc *.lst
 	@rm -f $(PROGRAM)_pnr.json

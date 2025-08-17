@@ -48,86 +48,25 @@ loop:
   lda.b #0x04
   sta pf0
 
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-
-  ;jsr ignore_lines
-
   lda.b #color_red
   sta colupf
 
+  ldx.l #480 - 2
+ignore_lines_loop:
   sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
+  dex
+  bne ignore_lines_loop
 
   ;;        pf0    pf1      pf2
   ;; pf = 000100 00000000 00000001
   lda.b #0x20
   sta pf0
 
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-
-  lda.b #color_orange
-  sta colupf
-
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-
-  lda.b #color_purple
-  sta colupf
-
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-  sta wsync
-
-  lda.b #color_black
+  lda.b #color_green
   sta colupf
 
   sta vsync
   jmp loop
-
-ignore_lines:
-  rts
-
-  ;ldx.l #500 - 15
-  ldx.l #10
-ignore_lines_loop:
-  sta wsync
-  dex
-  bne ignore_lines_loop
-  rts
 
 delay:
   ldx.l #0x0002_0000

@@ -12,3 +12,12 @@ pf0 equ 0x0d
 pf1 equ 0x0e
 pf2 equ 0x0f
 
+
+color_black  equ 0x00
+color_red    equ 0x32
+color_yellow equ 0x1e
+color_blue   equ 0x86
+color_green  equ 0xc8
+color_orange equ 0xfc
+color_purple equ 0x58
+
