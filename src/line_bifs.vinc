@@ -3,11 +3,11 @@
 // v_back_porch, v_image, v_front_porch, v_sync
 
 assign in_hblank =
-  hpos <  H_BACK_PORCH ||
-  hpos >= H_BACK_PORCH + H_IMAGE;
+  (hpos <  H_BACK_PORCH) ||
+  (hpos >= H_BACK_PORCH + H_IMAGE);
 assign in_vblank =
-  vpos <  V_BACK_PORCH ||
-  vpos >= V_BACK_PORCH + V_IMAGE;
+  (vpos <  V_BACK_PORCH) ||
+  (vpos >= V_BACK_PORCH + V_IMAGE);
 wire guard_pixel =
   hpos == H_BACK_PORCH - 2 ||
   hpos == H_BACK_PORCH - 1;
