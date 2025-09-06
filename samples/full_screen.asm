@@ -43,6 +43,8 @@ start:
   sta colubk
 
 loop:
+  sta vsync
+
   ;;        pf0    pf1      pf2
   ;; pf = 100000 00000000 00000001
   lda.b #0x04
@@ -51,9 +53,15 @@ loop:
   lda.b #color_red
   sta colupf
 
-  ldx.l #480 - 2
+  ;sta wsync
+  ;sta wsync
+
+  ;ldx.l #480 - 2
+  ldx.l #240 - 2
 ignore_lines_loop:
   sta wsync
+  inc
+  sta colupf
   dex
   bne ignore_lines_loop
 
@@ -65,7 +73,6 @@ ignore_lines_loop:
   lda.b #color_green
   sta colupf
 
-  sta vsync
   jmp loop
 
 delay:
