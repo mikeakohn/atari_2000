@@ -22,6 +22,8 @@ module hdmi
   output in_vblank,
   output reg [9:0] hpos,
   output reg [9:0] vpos,
+  output [9:0] hpos_start,
+  output [9:0] vpos_start,
   output in_image,
   output clk_pixel,
   input [6:0] color
@@ -42,7 +44,7 @@ wire clk_lock;
 
 // h_sync, h_back_porch, h_image, h_front_porch
 // v_sync, v_back_porch, v_image, v_front_porch
-//`include "line_sbif.vinc"
+`include "line_sbif.vinc"
 
 // h_back_porch, h_image, h_front_porch, h_sync
 // v_back_porch, v_image, v_front_porch, v_sync
@@ -54,7 +56,7 @@ wire clk_lock;
 
 // h_image, h_front_porch, h_sync, h_back_porch
 // v_image, v_front_porch, v_sync, v_back_porch
-`include "line_ifsb.vinc"
+//`include "line_ifsb.vinc"
 
 assign in_image    = ~(in_hblank || in_vblank);
 
@@ -86,7 +88,13 @@ always @(posedge clk_pixel) begin
   // Vertical   beam is 525 pixels
   if (hpos == WIDTH - 1) begin
     hpos <= 0;
-    vpos <= vpos == HEIGHT - 1 ? 0 : vpos + 1;
+    //vpos <= (vpos == HEIGHT - 1) ? 0 : vpos + 1;
+
+    if (vpos == HEIGHT - 1)
+      vpos <= 0;
+    else
+      vpos <= vpos + 1;
+
   end else begin
     hpos <= hpos + 1;
   end

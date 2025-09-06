@@ -2,6 +2,9 @@
 // h_back_porch, h_image, h_front_porch, h_sync
 // v_back_porch, v_image, v_front_porch, v_sync
 
+assign hpos_start = H_BACK_PORCH;
+assign vpos_start = V_BACK_PORCH;
+
 assign in_hblank =
   (hpos <  H_BACK_PORCH) ||
   (hpos >= H_BACK_PORCH + H_IMAGE);
