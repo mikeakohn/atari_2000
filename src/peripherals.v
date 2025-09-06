@@ -16,6 +16,7 @@ module peripherals
   input write_enable,
   input clk,
   input raw_clk,
+  output [5:0] leds,
   output joystick_0,
   output joystick_1,
   output joystick_2,
@@ -88,12 +89,24 @@ wire [9:0] hpos;
 wire [9:0] vpos;
 wire in_image;
 wire clk_pixel;
-reg wait_image_h = 0;
-reg wait_image_v = 0;
+//reg wait_image_h = 0;
+//reg wait_image_v = 0;
 reg wait_hblank = 0;
 reg wait_vblank = 0;
+wire [9:0] hpos_start;
+wire [9:0] vpos_start;
+
+//assign leds[5:0] = ~vpos[5:0];
+//assign leds[5:0] = ~vpos[9:4];
+reg [5:0] led_value;
+assign leds[5:0] = ~led_value;
+
+always @(posedge vpos[8]) begin
+  led_value <= led_value + 1;
+end
 
 assign wait_video = wait_hblank || wait_vblank;
+//assign wait_video = wait_hblank;
 
 wire is_fg = playfield[playfield_bit];
 
@@ -144,14 +157,12 @@ always @(posedge raw_clk) begin
       5'h00:
         begin
           wait_vblank <= 1;
-          if (!in_vblank) wait_image_v <= 1;
-          //wait_vblank <= 0;
-          //if (!in_vblank) wait_image_v <= 0;
+          //if (!in_vblank) wait_image_v <= 1;
         end
       5'h02:
         begin
           wait_hblank <= 1;
-          if (in_hblank) wait_image_h <= 1;
+          //if (in_hblank) wait_image_h <= 1;
         end
       5'h03: spi_tx_buffer_1[7:0] <= data_in;
       5'h04: begin tx_data <= data_in; tx_strobe <= 1; end
@@ -182,18 +193,25 @@ always @(posedge raw_clk) begin
 
     if (rx_ready_clear == 1) rx_ready_clear <= 0;
 
+/*
     if (in_hblank) begin
       if (wait_image_h == 0) wait_hblank <= 0;
     end
+*/
 
+/*
     if (!in_vblank) begin
       if (wait_image_v == 0) wait_vblank <= 0;
+      if (wait_image_v == 0) wait_vblank <= 0;
     end
+*/
 
-    if (vpos == 0) wait_vblank <= 0;
+    if (hpos == hpos_start) wait_hblank <= 0;
+    if (vpos == vpos_start) wait_vblank <= 0;
+    //if (vpos == 10) wait_vblank <= 0;
 
-    if (!in_hblank) wait_image_h <= 0;
-    if (in_vblank)  wait_image_v <= 0;
+    //if (!in_hblank) wait_image_h <= 0;
+    //if (in_vblank)  wait_image_v <= 0;
 
     if (enable) begin
       case (address[5:0])
@@ -238,25 +256,27 @@ uart uart_0
 );
 
 hdmi hdmi_0(
-  .clk       (raw_clk),
-  .dvi_d0_p  (dvi_d0_p),
-  .dvi_d0_n  (dvi_d0_n),
-  .dvi_d1_p  (dvi_d1_p),
-  .dvi_d1_n  (dvi_d1_n),
-  .dvi_d2_p  (dvi_d2_p),
-  .dvi_d2_n  (dvi_d2_n),
-  .dvi_ck_p  (dvi_ck_p),
-  .dvi_ck_n  (dvi_ck_n),
-  .in_hblank (in_hblank),
-  .in_vblank (in_vblank),
-  .hpos      (hpos),
-  .vpos      (vpos),
-  .in_image  (in_image),
-  .clk_pixel (clk_pixel),
-  .color     (color)
-  //.red       (red),
-  //.green     (green),
-  //.blue      (blue)
+  .clk        (raw_clk),
+  .dvi_d0_p   (dvi_d0_p),
+  .dvi_d0_n   (dvi_d0_n),
+  .dvi_d1_p   (dvi_d1_p),
+  .dvi_d1_n   (dvi_d1_n),
+  .dvi_d2_p   (dvi_d2_p),
+  .dvi_d2_n   (dvi_d2_n),
+  .dvi_ck_p   (dvi_ck_p),
+  .dvi_ck_n   (dvi_ck_n),
+  .in_hblank  (in_hblank),
+  .in_vblank  (in_vblank),
+  .hpos       (hpos),
+  .vpos       (vpos),
+  .hpos_start (hpos_start),
+  .vpos_start (vpos_start),
+  .in_image   (in_image),
+  .clk_pixel  (clk_pixel),
+  .color      (color)
+  //.red        (red),
+  //.green      (green),
+  //.blue       (blue)
 );
 
 endmodule
