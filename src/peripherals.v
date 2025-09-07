@@ -108,8 +108,6 @@ end
 assign wait_video = wait_hblank || wait_vblank;
 //assign wait_video = wait_hblank;
 
-wire is_fg = playfield[playfield_bit];
-
 //wire [9:0] img_x = hpos > 88 + 8 ? hpos - 88 + 8 : 0;
 
 // Original Atari 2600 is 20 * 2 bit playfield.
@@ -125,26 +123,35 @@ reg [6:0] color_p0;
 reg [6:0] color_p1;
 reg [6:0] color_fg;
 reg [6:0] color_bg;
+reg [2:0] ctrlpf = 0;
+
+wire is_fg = playfield[playfield_bit];
+wire [9:0] pos_x = hpos - hpos_start;
 
 always @(posedge clk_pixel) begin
-  //if (hpos >=8 && in_image) begin
   if (in_image) begin
-    if (hpos[3:0] == 0) begin
+    if (pos_x[3:0] == 0) begin
       if (is_fg) begin
         color <= color_fg;
       end else begin
         color <= color_bg;
       end
 
-      playfield_bit <= playfield_bit + playfield_dir;
-
-      if (playfield_bit == 0) begin
-        playfield_dir <= 1;
+      if (pos_x[9:4] == 22) begin
+        if (ctrlpf[0] == 0) begin
+          playfield_bit <= 21;
+          playfield_dir <= -1;
+        end else begin
+          playfield_bit <= 0;
+          playfield_dir <= 1;
+        end
+      end else begin
+        playfield_bit <= playfield_bit + playfield_dir;
       end
     end
   end else begin
-    playfield_dir <= -1;
     playfield_bit <= 21;
+    playfield_dir <= -1;
     color <= 0;
   end
 end
@@ -170,6 +177,7 @@ always @(posedge raw_clk) begin
       5'h07: color_p1 <= data_in[7:1];
       5'h08: color_fg <= data_in[7:1];
       5'h09: color_bg <= data_in[7:1];
+      5'h0a: ctrlpf[2:0] <= data_in[2:0];
       5'h0d:
         playfield[21:16] <=
         {

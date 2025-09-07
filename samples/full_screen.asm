@@ -46,9 +46,11 @@ loop:
   sta vsync
 
   ;;        pf0    pf1      pf2
-  ;; pf = 100000 00000000 00000001
-  lda.b #0x04
+  ;; pf = 111000 00000000 00000001
+  lda.b #0x1c
   sta pf0
+  lda.b #0
+  sta ctrlpf
 
   lda.b #color_red
   sta colupf
@@ -62,13 +64,25 @@ ignore_lines_loop:
 .ends
 
   ;;        pf0    pf1      pf2
-  ;; pf = 010000 00000000 00000001
-  lda.b #0x08
+  ;; pf = 001000 00000000 00000001
+  lda.b #0x10
   sta pf0
 
 .scope
-  ;ldx.l #480 - 2
-  ldx.l #240 - 2
+  ldx.l #120 - 2
+ignore_lines_loop:
+  sta wsync
+  inc
+  sta colupf
+  dex
+  bne ignore_lines_loop
+.ends
+
+  lda.b #1
+  sta ctrlpf
+
+.scope
+  ldx.l #120 - 2
 ignore_lines_loop:
   sta wsync
   inc

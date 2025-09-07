@@ -38,13 +38,13 @@ module hdmi
 wire clk_dvi;
 wire clk_lock;
 
-//`include "mode_720x480_hdmi.vinc"
-`include "mode_720x480_dvi.vinc"
+`include "mode_720x480_hdmi.vinc"
+//`include "mode_720x480_dvi.vinc"
 //`include "mode_640x480_dvi.vinc"
 
 // h_sync, h_back_porch, h_image, h_front_porch
 // v_sync, v_back_porch, v_image, v_front_porch
-`include "line_sbif.vinc"
+//`include "line_sbif.vinc"
 
 // h_back_porch, h_image, h_front_porch, h_sync
 // v_back_porch, v_image, v_front_porch, v_sync
@@ -56,7 +56,7 @@ wire clk_lock;
 
 // h_image, h_front_porch, h_sync, h_back_porch
 // v_image, v_front_porch, v_sync, v_back_porch
-//`include "line_ifsb.vinc"
+`include "line_ifsb.vinc"
 
 assign in_image    = ~(in_hblank || in_vblank);
 
