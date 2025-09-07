@@ -137,7 +137,8 @@ always @(posedge clk_pixel) begin
         color <= color_bg;
       end
 
-      if (pos_x[9:4] == 22) begin
+      // 720 / 2 = 360. 360 / 16 = 22.5.
+      if (pos_x[9:4] == 21) begin
         if (ctrlpf[0] == 0) begin
           playfield_bit <= 21;
           playfield_dir <= -1;
