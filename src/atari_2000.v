@@ -45,7 +45,7 @@ module atari_2000
   output dvi_ck_n
 );
 
-w65c832 w65c832_0
+micro86 micro86_0
 (
   .raw_clk       (raw_clk),
   .sd_card_di    (sd_card_di),

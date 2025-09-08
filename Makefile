@@ -14,7 +14,7 @@ SOURCE= \
   src/sd_card_sdhc.v \
   src/spi.v \
   src/uart.v \
-  src/w65c832.v
+  src/micro86.v
 
 default:
 	yosys -q \
@@ -38,6 +38,10 @@ blink:
 
 full_screen:
 	naken_asm -l -type bin -o rom.bin -Isamples samples/full_screen.asm
+	python3 tools/bin2txt.py rom.bin > rom.txt
+
+full_screen_x86:
+	nasm -o rom.bin samples/full_screen_x86.asm
 	python3 tools/bin2txt.py rom.bin > rom.txt
 
 clean:
