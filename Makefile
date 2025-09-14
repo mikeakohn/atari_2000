@@ -8,6 +8,7 @@ SOURCE= \
   src/hdmi.v \
   src/memory_bus.v \
   src/peripherals.v \
+  src/player.v \
   src/ram.v \
   src/reg_mode.v \
   src/rom.v \

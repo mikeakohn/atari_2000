@@ -99,6 +99,18 @@ ignore_lines_loop:
   lda.b #color_green
   sta colupf
 
+.if 0
+  lda.b #0xf0
+  sta grp0
+  lda.b #0xce
+  sta colup0
+
+  lda.b #0x0f
+  sta grp0
+  lda.b #0x4a
+  sta colup0
+.endif
+
   jmp loop
 
 delay:

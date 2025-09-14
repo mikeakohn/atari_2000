@@ -58,6 +58,30 @@ line_loop_2:
   mov [pf0], byte 0x20
   mov [colupf], byte color_green
 
+  ;; Display a sprite.
+  mov [grp0], byte 0xf0
+  mov [colup0], byte 0xce
+
+  mov ecx, 100
+sprite_delay_0:
+  dec ecx
+  jnz sprite_delay_0
+
+  mov [resp0], al
+  mov [wsync], al
+
+  ;; Display a second sprite.
+  mov [grp0], byte 0x0f
+  mov [colup0], byte 0x4a
+
+  mov ecx, 100
+sprite_delay_1:
+  dec ecx
+  jnz sprite_delay_1
+
+  mov [resp0], al
+  mov [wsync], al
+
   jmp loop
 
 delay:
