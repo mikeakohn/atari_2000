@@ -37,6 +37,8 @@ always @(posedge clk) begin
       2'b01:   if (sprite_clock[1:0] == 0) bit = bit + 1;
       default: if (sprite_clock[2:0] == 0) bit = bit + 1;
     endcase
+
+    if (bit == 8) active <= 0;
   end
 end
 

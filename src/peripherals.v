@@ -162,10 +162,10 @@ always @(posedge clk_pixel) begin
   if (in_image) begin
     if (pos_x[3:0] == 0) begin
 /*
-      if (is_fg) begin
-        playfield_color <= color_fg;
+      if (playfield[playfield_bit]) begin
+        color <= color_fg;
       end else begin
-        playfield_color <= color_bg;
+        color <= color_bg;
       end
 */
 
@@ -187,7 +187,6 @@ always @(posedge clk_pixel) begin
   end else begin
     playfield_bit <= 21;
     playfield_dir <= -1;
-    //color <= 0;
   end
 end
 

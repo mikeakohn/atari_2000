@@ -333,6 +333,7 @@ always @(posedge clk) begin
       STATE_FETCH_OP_0:
         begin
           result <= 0;
+          alu_op <= 0;
           alu_size <= 0;
           alu_reverse_sign <= 0;
           long_jmp <= 0;
