@@ -7,9 +7,9 @@ sprite_pos_1 equ 0x8004
 sprite_dx_0  equ 0x8008
 sprite_dx_1  equ 0x800c
 
-sprite_x  equ 7
-sprite_x0 equ 5
-sprite_x1 equ 12
+sprite_x  equ 200
+sprite_x0 equ 100
+sprite_x1 equ 500
 
 org 0x4000
 start:
@@ -22,8 +22,8 @@ start:
 
   mov [colubk], byte color_blue
 
-  mov [sprite_pos_0], dword sprite_x << 4
-  mov [sprite_pos_1], dword sprite_x << 4
+  mov [sprite_pos_0], dword sprite_x
+  mov [sprite_pos_1], dword sprite_x
   mov [sprite_dx_0],  dword   1
   mov [sprite_dx_1],  dword  -1
 
@@ -73,51 +73,63 @@ line_loop_2:
   mov [colupf], byte color_green
   mov [wsync], al
 
+  ;; Enable player_0.
+  mov [sprite_en], byte 1
+
   ;; Display a sprite.
   mov [grp0],   byte 0xf0
   mov [colup0], byte 0xce
 
-  mov ecx, [sprite_pos_0]
-  add ecx, [sprite_dx_0]
-  mov [sprite_pos_0], ecx
-  shr ecx, 4
-  cmp ecx, sprite_x0
+  mov eax, [sprite_pos_0]
+  mov [p0_xl], al
+  mov [p0_xh], ah
+
+  add eax, [sprite_dx_0]
+  mov [sprite_pos_0], eax
+
+  cmp eax, sprite_x0
   jnz sprite_0_not_left
   mov [sprite_dx_0], dword 1
 sprite_0_not_left:
-  cmp ecx, sprite_x1
+  cmp eax, sprite_x1
   jnz sprite_0_not_right
   mov [sprite_dx_0], dword -1
 sprite_0_not_right:
-sprite_delay_0:
-  dec ecx
-  jnz sprite_delay_0
 
-  mov [resp0], al
+  mov ecx, 5
+line_loop_3:
   mov [wsync], al
+  sub ecx, 1
+  jnz line_loop_3
 
   ;; Display a second sprite.
   mov [grp0],   byte 0xaa
   mov [colup0], byte 0x4a
 
-  mov ecx, [sprite_pos_1]
-  add ecx, [sprite_dx_1]
-  mov [sprite_pos_1], ecx
-  shr ecx, 4
-  cmp ecx, sprite_x0
+  mov eax, [sprite_pos_1]
+  mov [p0_xl], al
+  mov [p0_xh], ah
+
+  add eax, [sprite_dx_1]
+  mov [sprite_pos_1], eax
+
+  cmp eax, sprite_x0
   jnz sprite_1_not_left
   mov [sprite_dx_1], dword 1
 sprite_1_not_left:
-  cmp ecx, sprite_x1
+  cmp eax, sprite_x1
   jnz sprite_1_not_right
   mov [sprite_dx_1], dword -1
 sprite_1_not_right:
-sprite_delay_1:
-  dec ecx
-  jnz sprite_delay_1
 
-  mov [resp0], al
+  mov ecx, 5
+line_loop_4:
   mov [wsync], al
+  sub ecx, 1
+  jnz line_loop_4
+
+  ;; Disable player_0.
+  mov [sprite_en], byte 0
 
   jmp loop
 

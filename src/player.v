@@ -13,7 +13,7 @@ module player
   input [7:0] data,
   input [1:0] width,
   input strobe,
-  input direction,
+  input reflection,
   input clk
 );
 
@@ -22,7 +22,7 @@ reg [2:0] sprite_clock;
 reg active;
 
 wire value = active == 0 ? 0 :
-  (direction == 1 ? data[bit] : data[7 - bit]);
+  (reflection == 0 ? data[bit] : data[7 - bit]);
 
 always @(posedge clk) begin
   if (strobe) begin
@@ -45,7 +45,7 @@ end
 /*
 always @(posedge sprite_clock[width]) begin
   if (active) begin
-    //value <= direction == 1 ? data[bit] : data[7 - bit];
+    //value <= reflection == 1 ? data[bit] : data[7 - bit];
 
     bit <= bit + 1;
     //if (bit == 7) active <= 0;
