@@ -93,6 +93,8 @@ wire clk_pixel;
 //reg wait_image_v = 0;
 reg wait_hblank = 0;
 reg wait_vblank = 0;
+reg wait_hblank_clear = 0;
+reg wait_vblank_clear = 0;
 wire [9:0] hpos_start;
 wire [9:0] vpos_start;
 
@@ -325,8 +327,8 @@ always @(posedge raw_clk) begin
     end
 */
 
-    if (hpos == hpos_start) wait_hblank <= 0;
-    if (vpos == vpos_start) wait_vblank <= 0;
+    if (hpos == hpos_start) wait_hblank_clear <= 1;
+    if (vpos == vpos_start) wait_vblank_clear <= 1;
     //if (vpos == 10) wait_vblank <= 0;
 
     //if (!in_hblank) wait_image_h <= 0;
@@ -334,7 +336,8 @@ always @(posedge raw_clk) begin
 
     if (enable) begin
       case (address[5:0])
-        //5'h0: data_out <= buttons;
+        5'h1: data_out <= in_vblank;
+        5'h3: data_out <= in_hblank;
         5'hc: begin data_out <= rx_data; rx_ready_clear <= 1; end
         5'hd: data_out <= { rx_ready, tx_busy };
         //5'he: data_out <= spi_tx_buffer_1[7:0];
@@ -345,6 +348,16 @@ always @(posedge raw_clk) begin
         5'h13: data_out <= load_count;
       endcase
     end
+  end
+
+  if (wait_hblank_clear) begin
+    wait_hblank <= 0;
+    wait_hblank_clear <= 0;
+  end
+
+  if (wait_vblank_clear) begin
+    wait_vblank <= 0;
+    wait_vblank_clear <= 0;
   end
 end
 

@@ -2,6 +2,7 @@
 vsync  equ 0x00
 vblank equ 0x01
 wsync  equ 0x02
+hblank equ 0x03
 
 nusiz0 equ 0x04
 nusiz1 equ 0x05
