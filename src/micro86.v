@@ -350,11 +350,10 @@ always @(posedge clk) begin
           mem_address <= rip;
           mem_write_enable <= 0;
 
-/*
-if (break == 1) begin
-state <= STATE_HALTED;
-end else
-*/
+          //temp <= 0;
+          //dest_value <= 0;
+
+//if (break == 1) state <= STATE_HALTED; else
           state <= STATE_FETCH_OP_1;
         end
       STATE_FETCH_OP_1:
@@ -581,68 +580,62 @@ end else
                       end
                     end
                   2'b11:
-                    case (instruction[3:0])
-                      4'b0100:
-                        begin
-                          // hlt
-                          state <= STATE_HALTED;
-                        end
-                      4'b0101:
-                        begin
-                          flag_carry <= ~flag_carry;
-                          state <= STATE_FETCH_OP_0;
-                        end
-/*
-                      4'b0010:
-                        begin
-                          alu_op <= ALU_TEST;
-                          state <= STATE_FETCH_MOD_RM_0;
-                        end
-                      4'b0011:
-                        begin
-                          alu_op <= ALU_TEST;
-                          state <= STATE_FETCH_MOD_RM_0;
-                        end
-*/
-                      4'b0110:
-                        begin
-                          // neg
-                          alu_size[0] = 1;
-                          alu_op <= ALU_NEG;
-                          state <= STATE_FETCH_MOD_RM_0;
-                        end
-                      4'b0111:
-                        begin
-                          // neg eax:          0xf7 0xd8
-                          //                          d8 = 11 011 reg (reg = 3)
-                          // test edi, 0x8000: 0xf7,0xc7,0x00,0x80,0x00,0x00
-                          //                          c7 = 11 000 111 (reg = 0)
-                          alu_op <= ALU_NEG;
-                          state <= STATE_FETCH_MOD_RM_0;
-                        end
-                      4'b1111:
-                        begin
-                          // call eax: 0xff 0xd0 (MOD_RM)
-                          alu_op <= ALU_JMP;
-                          is_call <= 1;
-                          state <= STATE_FETCH_MOD_RM_0;
-                        end
-                      default:
-                        begin
-                          //error_code <= 5;
-                          state <= STATE_ERROR;
-                        end
-                    endcase
-                  default:
                     case (instruction[3:1])
+                      3'b010:
+                        begin
+                          if (instruction[0] == 0) begin
+                            // hlt
+                            state <= STATE_HALTED;
+                          end else begin
+                            // cmc
+                            flag_carry <= ~flag_carry;
+                            state <= STATE_FETCH_OP_0;
+                          end
+                        end
+                      3'b011:
+                        begin
+                          // neg [offset]        f6 1d 00 00 00 00
+                          //   1111 0110  00 011 101
+                          // test [offset], imm  f6 05 00 00 00 00 01
+                          //   1111 0110  00 000 101
+                          // neg eax:            f7 d8
+                          //   d8 = 11 011 reg (reg = 3)
+                          // test edi, 0x8000:   f7 c7 00 80 00 00
+                          //   c7 = 11 000 111 (reg = 0)
+                          alu_size[0] <= ~instruction[0];
+                          alu_op <= ALU_NEG;
+                          state <= STATE_FETCH_MOD_RM_0;
+                        end
                       3'b100:
                         begin
+                          // clc 0xf8
+                          // stc 0xf9
                           flag_carry <= instruction[0];
                           state <= STATE_FETCH_OP_0;
                         end
+/*
+                      3'b110:
+                        begin
+                          // cld 0xfc
+                          // std 0xfe
+                          flag_direction <= instruction[0];
+                          state <= STATE_FETCH_OP_0;
+                        end
+*/
+                      3'b111:
+                        begin
+                          if (instruction[0] == 0) begin
+                            // inc / dec
+                            state <= STATE_ERROR;
+                          end else begin
+                            // call eax: 0xff 0xd0 (MOD_RM)
+                            alu_op <= ALU_JMP;
+                            is_call <= 1;
+                            state <= STATE_FETCH_MOD_RM_0;
+                          end
+                        end
                       default:
                         begin
-                          //error_code <= 6;
                           state <= STATE_ERROR;
                         end
                     endcase
@@ -1352,7 +1345,8 @@ end else
             2'b10: mem_last <= 1;
             default: mem_last <= 3;
           endcase
-          state <= STATE_FETCH_DATA32_0;
+
+          state <= STATE_ALU_1;
           next_state <= STATE_ALU_EXECUTE_1;
         end
       STATE_SHIFT_0:
