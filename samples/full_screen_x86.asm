@@ -30,12 +30,42 @@ start:
   mov ebx, 0
 
 loop:
+  ;; Playfield has priority over sprites, do not reflect.
+  mov al, 0
+  mov [ebx+ctrlpf], al
+
+  mov eax, [sprite_pos_0]
+  add eax, [sprite_dx_0]
+  mov [sprite_pos_0], eax
+
+  cmp eax, sprite_x0
+  jnz sprite_0_not_left
+  mov [sprite_dx_0], dword 1
+sprite_0_not_left:
+  cmp eax, sprite_x1
+  jnz sprite_0_not_right
+  mov [sprite_dx_0], dword -1
+sprite_0_not_right:
+
+  mov eax, [sprite_pos_1]
+  add eax, [sprite_dx_1]
+  mov [sprite_pos_1], eax
+
+  cmp eax, sprite_x0
+  jnz sprite_1_not_left
+  mov [sprite_dx_1], dword 1
+sprite_1_not_left:
+  cmp eax, sprite_x1
+  jnz sprite_1_not_right
+  mov [sprite_dx_1], dword -1
+sprite_1_not_right:
+
   mov [vsync], al
 
   ;;        pf0    pf1      pf2
   ;; pf = 111000 00000000 00000001
   mov [pf0], byte 0x1c
-  mov [ctrlpf], byte 0
+  ;mov [ebx+ctrlpf], byte 0
 
   mov [colupf], byte color_red
 
@@ -82,36 +112,29 @@ line_loop_2:
   mov eax, [sprite_pos_0]
   mov [ebx+p0_xl], ax
 
-  add eax, [sprite_dx_0]
-  mov [sprite_pos_0], eax
+wait_hblank_0:
+  test [ebx+hblank], byte 1
+  jz wait_hblank_0
 
   ;; Enable player_0.
   mov [ebx+sprite_en], byte 1
 
-  cmp eax, sprite_x0
-  jnz sprite_0_not_left
-  mov [sprite_dx_0], dword 1
-sprite_0_not_left:
-  cmp eax, sprite_x1
-  jnz sprite_0_not_right
-  mov [sprite_dx_0], dword -1
-sprite_0_not_right:
-
   mov [ebx+wsync], al
   mov [ebx+wsync], al
   mov [ebx+wsync], al
   mov [ebx+wsync], al
   mov [ebx+wsync], al
 
-wait_hblank:
+wait_hblank_1:
   test [ebx+hblank], byte 1
-  jz wait_hblank
+  jz wait_hblank_1
 
-;  mov ecx, 5
-;line_loop_3:
-;  mov [wsync], al
-;  sub ecx, 1
-;  jnz line_loop_3
+  ;; Disable player_0.
+  mov [ebx+sprite_en], byte 0
+
+  ;; Playfield has priority over sprites, do not reflect.
+  mov al, 4
+  mov [ebx+ctrlpf], al
 
   ;; Display a second sprite.
   mov eax, [sprite_pos_1]
@@ -119,18 +142,10 @@ wait_hblank:
 
   mov [ebx+grp0],   byte 0xaa
   mov [ebx+colup0], byte 0x4a
+  mov [ebx+wsync], al
 
-  add eax, [sprite_dx_1]
-  mov [sprite_pos_1], eax
-
-  cmp eax, sprite_x0
-  jnz sprite_1_not_left
-  mov [sprite_dx_1], dword 1
-sprite_1_not_left:
-  cmp eax, sprite_x1
-  jnz sprite_1_not_right
-  mov [sprite_dx_1], dword -1
-sprite_1_not_right:
+  ;; Enable player_0.
+  mov [ebx+sprite_en], byte 1
 
   mov [ebx+wsync], al
   mov [ebx+wsync], al

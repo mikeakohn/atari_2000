@@ -201,14 +201,27 @@ always @(posedge clk_pixel) begin
 end
 
 always @ * begin
-  if (player_0_value)
-    color = color_p0;
-  else if (player_1_value)
-    color = color_p1;
-  else if (playfield_value)
-    color = color_fg;
-  else
-    color = color_bg;
+  if (ctrlpf[2] == 0) begin
+    if (player_0_value)
+      color = color_p0;
+    else if (player_1_value)
+      color = color_p1;
+    else if (playfield_value)
+      color = color_fg;
+    else
+      color = color_bg;
+  end else begin
+    if (playfield_value)
+      color = color_fg;
+    else if (player_0_value)
+      color = color_p0;
+    else if (player_1_value)
+      color = color_p1;
+    else
+      color = color_bg;
+  end
+
+
 end
 
 always @(posedge raw_clk) begin
