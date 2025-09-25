@@ -27,6 +27,8 @@ start:
   mov [sprite_dx_0],  dword   1
   mov [sprite_dx_1],  dword  -1
 
+  mov ebx, 0
+
 loop:
   mov [vsync], al
 
@@ -39,7 +41,7 @@ loop:
 
   mov ecx, 10
 line_loop_0:
-  mov [wsync], al
+  mov [ebx+wsync], al
   sub ecx, 1
   jnz line_loop_0
 
@@ -50,41 +52,41 @@ line_loop_0:
 
   mov ecx, 120 - 2
 line_loop_1:
-  mov [wsync], al
+  mov [ebx+wsync], al
   add al, 1
-  mov [colupf], al
+  mov [ebx+colupf], al
   sub ecx, 1
   jnz line_loop_1
 
   mov al, 1
-  mov [ctrlpf], al
+  mov [ebx+ctrlpf], al
 
   mov ecx, 120 - 2
 line_loop_2:
-  mov [wsync], al
+  mov [ebx+wsync], al
   add al, 1
-  mov [colupf], al
+  mov [ebx+colupf], al
   sub ecx, 1
   jnz line_loop_2
 
   ;;        pf0    pf1      pf2
   ;; pf = 000100 00000000 00000001
-  mov [pf0], byte 0x20
-  mov [colupf], byte color_green
-  mov [wsync], al
+  mov [ebx+pf0], byte 0x20
+  mov [ebx+colupf], byte color_green
+  mov [ebx+wsync], al
 
   ;; Display a sprite.
-  mov [grp0],   byte 0xf0
-  mov [colup0], byte 0xce
+  mov [ebx+grp0],   byte 0xf0
+  mov [ebx+colup0], byte 0xce
 
   mov eax, [sprite_pos_0]
-  mov [p0_xl], ax
+  mov [ebx+p0_xl], ax
 
   add eax, [sprite_dx_0]
   mov [sprite_pos_0], eax
 
   ;; Enable player_0.
-  mov [sprite_en], byte 1
+  mov [ebx+sprite_en], byte 1
 
   cmp eax, sprite_x0
   jnz sprite_0_not_left
@@ -95,14 +97,14 @@ sprite_0_not_left:
   mov [sprite_dx_0], dword -1
 sprite_0_not_right:
 
-  mov [wsync], al
-  mov [wsync], al
-  mov [wsync], al
-  mov [wsync], al
-  mov [wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
 
 wait_hblank:
-  test [hblank], byte 1
+  test [ebx+hblank], byte 1
   jz wait_hblank
 
 ;  mov ecx, 5
@@ -113,10 +115,10 @@ wait_hblank:
 
   ;; Display a second sprite.
   mov eax, [sprite_pos_1]
-  mov [p0_xl], ax;
+  mov [ebx+p0_xl], ax;
 
-  mov [grp0],   byte 0xaa
-  mov [colup0], byte 0x4a
+  mov [ebx+grp0],   byte 0xaa
+  mov [ebx+colup0], byte 0x4a
 
   add eax, [sprite_dx_1]
   mov [sprite_pos_1], eax
@@ -130,20 +132,20 @@ sprite_1_not_left:
   mov [sprite_dx_1], dword -1
 sprite_1_not_right:
 
-  mov [wsync], al
-  mov [wsync], al
-  mov [wsync], al
-  mov [wsync], al
-  mov [wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
 
   mov ecx, 5
 line_loop_4:
-  mov [wsync], al
+  mov [ebx+wsync], al
   sub ecx, 1
   jnz line_loop_4
 
   ;; Disable player_0.
-  mov [sprite_en], byte 0
+  mov [ebx+sprite_en], byte 0
 
   jmp loop
 
