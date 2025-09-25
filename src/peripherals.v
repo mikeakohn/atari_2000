@@ -233,20 +233,26 @@ always @(posedge raw_clk) begin
       5'h02: wait_hblank <= 1;
       6'h04:
         begin
+          player_0_width <= data_in[1:0];
+/*
           case (data_in[2:0])
             3'b101:  player_0_width <= 1;
             3'b111:  player_0_width <= 2;
             default: player_0_width <= 0;
           endcase
+*/
           missile_0_width <= data_in[5:4];
         end
       6'h05:
         begin
+          player_1_width <= data_in[1:0];
+/*
           case (data_in[2:0])
             3'b101:  player_1_width <= 1;
             3'b111:  player_1_width <= 2;
             default: player_1_width <= 0;
           endcase
+*/
           missile_1_width <= data_in[5:4];
         end
       6'h06: color_p0 <= data_in[7:1];

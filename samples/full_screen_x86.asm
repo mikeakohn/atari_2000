@@ -2,10 +2,12 @@
 
 bits 32
 
-sprite_pos_0 equ 0x8000
-sprite_pos_1 equ 0x8004
-sprite_dx_0  equ 0x8008
-sprite_dx_1  equ 0x800c
+sprite_pos_0   equ 0x8000
+sprite_pos_1   equ 0x8004
+sprite_dx_0    equ 0x8008
+sprite_dx_1    equ 0x800c
+sprite_width   equ 0x8010
+sprite_counter equ 0x8014
 
 sprite_x  equ 200
 sprite_x0 equ 100
@@ -26,6 +28,9 @@ start:
   mov [sprite_pos_1], dword sprite_x
   mov [sprite_dx_0],  dword   1
   mov [sprite_dx_1],  dword  -1
+
+  mov [sprite_width],   dword 0 
+  mov [sprite_counter], dword 0 
 
   mov ebx, 0
 
@@ -59,6 +64,23 @@ sprite_1_not_left:
   jnz sprite_1_not_right
   mov [sprite_dx_1], dword -1
 sprite_1_not_right:
+
+  ;mov al, [sprite_counter]
+  
+  add [sprite_counter], byte 1
+  mov al, [sprite_counter]
+  cmp al, 60
+  jnz sprite_counter_not_60
+  mov [sprite_counter], byte 0
+  mov al, [sprite_width]
+  mov [nusiz0], al
+  add al, 1
+  cmp al, 3
+  jnz sprite_size_okay
+  mov al, 0
+sprite_size_okay:
+  mov [sprite_width], al
+sprite_counter_not_60:
 
   mov [vsync], al
 

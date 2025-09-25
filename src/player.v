@@ -42,18 +42,5 @@ always @(posedge clk) begin
   end
 end
 
-/*
-always @(posedge sprite_clock[width]) begin
-  if (active) begin
-    //value <= reflection == 1 ? data[bit] : data[7 - bit];
-
-    bit <= bit + 1;
-    //if (bit == 7) active <= 0;
-  //end else begin
-  //  value <= 0;
-  end
-end
-*/
-
 endmodule
 
