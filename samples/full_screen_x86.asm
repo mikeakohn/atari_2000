@@ -60,21 +60,21 @@ start:
   ;; Setup missile 0.
   mov [m0_xl],  word 30
   mov [m0_yl],  word 30
-  mov [m0_len], word 4
+  mov [m0_len], word 8
   mov [missile_0_dx], dword 1
   mov [missile_0_dy], dword 1
 
   ;; Setup missile 1.
   mov [m1_xl],  word 200
   mov [m1_yl],  word 200
-  mov [m1_len], word 4
+  mov [m1_len], word 8
   mov [missile_1_dx], dword -1
   mov [missile_1_dy], dword 1
 
   ;; Setup ball.
   mov [bl_xl],  word 300
   mov [bl_yl],  word 300
-  mov [bl_len], word 8
+  mov [bl_len], word 16
   mov [bl_siz], byte 0x03
   mov [ball_dx], dword -1
   mov [ball_dy], dword -1

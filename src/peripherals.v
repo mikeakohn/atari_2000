@@ -168,15 +168,15 @@ assign player_0_strobe  = player_0_posx  == hpos && player_0_enable;
 assign player_1_strobe  = player_1_posx  == hpos && player_1_enable;
 assign missile_0_strobe =
   missile_0_posx == hpos &&
-  missile_0_posy == vpos &&
+  missile_0_posy >= vpos && missile_0_posy < vpos + missile_0_len &&
   missile_0_enable;
 assign missile_1_strobe =
    missile_1_posx == hpos &&
-   missile_1_posy == vpos &&
+   missile_1_posy >= vpos && missile_1_posy < vpos + missile_1_len &&
    missile_1_enable;
 assign ball_strobe =
    ball_posx == hpos &&
-   ball_posy == vpos &&
+   ball_posy >= vpos && ball_posy < vpos + ball_len &&
    ball_enable;
 
 always @(posedge clk_pixel) begin
@@ -291,7 +291,7 @@ always @(posedge raw_clk) begin
       7'h2b: ball_posx[9:8] <= data_in[1:0];
       7'h2c: ball_posy[7:0] <= data_in[7:0];
       7'h2d: ball_posy[9:8] <= data_in[1:0];
-      7'h2e: ball_len[7:0]  <= data_in[1:0];
+      7'h2e: ball_len       <= data_in;
       7'h42: begin tx_data <= data_in; tx_strobe <= 1; end
       default: storage[address] <= data_in;
     endcase
