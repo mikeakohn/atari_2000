@@ -351,6 +351,11 @@ wait_hblank_2:
   ;; Enable player 1.
   mov [ebx+sprite_en], byte player1_enable
   mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
   mov [ebx+sprite_en], byte player_disable
 
   jmp loop
