@@ -78,8 +78,6 @@ wire [9:0] hpos;
 wire [9:0] vpos;
 wire in_image;
 wire clk_pixel;
-//reg wait_image_h = 0;
-//reg wait_image_v = 0;
 reg wait_hblank = 0;
 reg wait_vblank = 0;
 reg wait_hblank_clear = 0;
@@ -225,8 +223,6 @@ always @ * begin
     else
       color = color_bg;
   end
-
-
 end
 
 always @(posedge raw_clk) begin
@@ -276,6 +272,7 @@ always @(posedge raw_clk) begin
       7'h17: missile_1_posy[7:0] <= data_in[7:0];
       7'h18: missile_1_posy[9:8] <= data_in[1:0];
       7'h19: missile_1_len       <= data_in;
+      //7'h1a:
       7'h1b: player_0_data <= data_in;
       7'h1c: player_1_data <= data_in;
       7'h25:
@@ -315,6 +312,16 @@ always @(posedge raw_clk) begin
         7'h01: data_out <= in_vblank;
         7'h03: data_out <= in_hblank;
         7'h0a: data_out <= ctrlpf[5:0];
+        7'h10: data_out <= missile_0_posx[7:0];
+        7'h11: data_out <= missile_0_posx[9:8];
+        7'h12: data_out <= missile_0_posy[7:0];
+        7'h13: data_out <= missile_0_posy[9:8];
+        7'h14: data_out <= missile_0_len;
+        7'h15: data_out <= missile_1_posx[7:0];
+        7'h16: data_out <= missile_1_posx[9:8];
+        7'h17: data_out <= missile_1_posy[7:0];
+        7'h18: data_out <= missile_1_posy[9:8];
+        7'h19: data_out <= missile_1_len;
         7'h25:
           data_out <=
           {
@@ -324,6 +331,14 @@ always @(posedge raw_clk) begin
             player_1_enable,
             player_0_enable
           };
+        7'h26: data_out <= player_0_posx[7:0];
+        7'h27: data_out <= player_0_posx[9:8];
+        7'h28: data_out <= player_1_posx[7:0];
+        7'h29: data_out <= player_1_posx[9:8];
+        7'h2a: data_out <= ball_posx[7:0];
+        7'h2b: data_out <= ball_posx[9:8];
+        7'h2c: data_out <= ball_posy[7:0];
+        7'h2d: data_out <= ball_posy[9:8];
         7'h40: data_out <= { rx_ready, tx_busy };
         7'h41: begin data_out <= rx_data; rx_ready_clear <= 1; end
         7'h43: data_out <= load_count;

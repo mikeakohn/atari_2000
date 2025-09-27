@@ -13,46 +13,49 @@ colupf equ 0x08
 colubk equ 0x09
 ctrlpf equ 0x0a
 
-refp0 equ 0x0b
-refp1 equ 0x0c
+refp0  equ 0x0b
+refp1  equ 0x0c
 
-ctrlpf equ 0x0a
+pf0    equ 0x0d
+pf1    equ 0x0e
+pf2    equ 0x0f
 
-pf0 equ 0x0d
-pf1 equ 0x0e
-pf2 equ 0x0f
+;; Missile 0.
+m0_xl  equ 0x10
+m0_xh  equ 0x11
+m0_yl  equ 0x12
+m0_yh  equ 0x13
+m0_len equ 0x14
 
-;resp0 equ 0x10
-;resp1 equ 0x11
-;resm0 equ 0x12
-;resm1 equ 0x13
-;resbl equ 0x14
+;; Missile 1.
+m1_xl  equ 0x15
+m1_xh  equ 0x16
+m1_yl  equ 0x17
+m1_yh  equ 0x18
+m1_len equ 0x19
 
-grp0 equ 0x1b
-grp1 equ 0x1c
-;enam0 equ 0x1d
-;enam1 equ 0x1e
-;enabl equ 0x1f
-
-;hmp0 equ 0x20
-;hmp1 equ 0x21
-;hmm0 equ 0x22
-;hmm1 equ 0x23
-;hmbl equ 0x24
+;; Player 0/1 data graphics.
+grp0   equ 0x1b
+grp1   equ 0x1c
 
 ;; Sprite Enable bits:
 ;; 4:bl, 3:m1, 2:m0, 1:p1, 1:p0
 sprite_en equ 0x25
+
+;; Player 0.
 p0_xl equ 0x26
 p0_xh equ 0x27
+
+;; Player 1.
 p1_xl equ 0x28
 p1_xh equ 0x29
-m0_xl equ 0x2a
-m0_xh equ 0x2b
-m1_xl equ 0x2c
-m1_xh equ 0x2d
-bl_xl equ 0x2e
-bl_xh equ 0x2f
+
+;; Ball.
+bl_xl  equ 0x2a
+bl_xh  equ 0x2b
+bl_yl  equ 0x2c
+bl_yh  equ 0x2d
+bl_len equ 0x2e
 
 uart_status equ 0x40
 uart_rx     equ 0x41
