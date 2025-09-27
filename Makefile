@@ -7,6 +7,7 @@ SOURCE= \
   src/encode_8b10b.v \
   src/hdmi.v \
   src/memory_bus.v \
+  src/missile.v \
   src/peripherals.v \
   src/player.v \
   src/ram.v \

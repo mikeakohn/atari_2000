@@ -117,7 +117,7 @@ rom rom_0(
 
 peripherals peripherals_0(
   .enable       (peripherals_enable),
-  .address      (address[5:0]),
+  .address      (address[7:0]),
   .data_in      (data_in),
   .data_out     (peripherals_data_out),
   .write_enable (peripherals_write_enable),

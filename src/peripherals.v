@@ -10,7 +10,7 @@
 module peripherals
 (
   input enable,
-  input  [5:0] address,
+  input  [7:0] address,
   input  [7:0] data_in,
   output reg [7:0] data_out,
   input write_enable,
@@ -23,10 +23,6 @@ module peripherals
   output joystick_3,
   output joystick_4,
   input button_0,
-  //output reg spi_cs_1,
-  //output spi_clk_1,
-  //output spi_mosi_1,
-  //input  spi_miso_1,
   output uart_tx_0,
   input  uart_rx_0,
   input [7:0] load_count,
@@ -42,7 +38,7 @@ module peripherals
   input reset
 );
 
-reg [7:0] storage [3:0];
+reg [7:0] storage [255:0];
 
 //reg [15:0] speaker_value_high;
 //reg [15:0] speaker_value_curr;
@@ -65,13 +61,6 @@ assign ioport_2 = ioport_b[1];
 assign ioport_3 = ioport_b[2];
 assign ioport_4 = ioport_b[3];
 */
-
-// SPI 1.
-//wire [7:0] spi_rx_buffer_1;
-//reg  [7:0] spi_tx_buffer_1;
-//wire spi_busy_1;
-//reg spi_start_1 = 0;
-//reg [2:0] spi_divisor_1 = 0;
 
 // UART 0.
 wire tx_busy;
@@ -126,7 +115,7 @@ reg [6:0] color_p0;
 reg [6:0] color_p1;
 reg [6:0] color_fg;
 reg [6:0] color_bg;
-reg [2:0] ctrlpf = 0;
+reg [5:0] ctrlpf = 0;
 
 //wire is_fg = playfield[playfield_bit];
 wire [9:0] pos_x = hpos - hpos_start;
@@ -151,30 +140,46 @@ wire player_1_strobe;
 reg player_1_reflection;
 reg player_1_enable;
 
+wire missile_0_value;
 reg [9:0] missile_0_posx;
-reg [3:0] missile_0_h_delay;
+reg [9:0] missile_0_posy;
+reg [7:0] missile_0_len;
 reg [1:0] missile_0_width;
 reg missile_0_v_delay_flag;
 wire missile_0_strobe;
 reg missile_0_enable;
 
+wire missile_1_value;
 reg [9:0] missile_1_posx;
-reg [3:0] missile_1_h_delay;
+reg [9:0] missile_1_posy;
+reg [7:0] missile_1_len;
 reg [1:0] missile_1_width;
 reg missile_1_v_delay_flag;
 wire missile_1_strobe;
 reg missile_1_enable;
 
+wire ball_value;
 reg [9:0] ball_posx;
-reg [3:0] ball_h_delay;
+reg [9:0] ball_posy;
+reg [7:0] ball_len;
+wire [1:0] ball_width = ctrlpf[5:4];
 wire ball_strobe;
 reg ball_enable;
 
 assign player_0_strobe  = player_0_posx  == hpos && player_0_enable;
 assign player_1_strobe  = player_1_posx  == hpos && player_1_enable;
-assign missile_0_strobe = missile_0_posx == hpos && missile_0_enable;
-assign missile_1_strobe = missile_1_posx == hpos && missile_1_enable;
-assign ball_strobe      = ball_posx      == hpos && ball_enable;
+assign missile_0_strobe =
+  missile_0_posx == hpos &&
+  missile_0_posy == vpos &&
+  missile_0_enable;
+assign missile_1_strobe =
+   missile_1_posx == hpos &&
+   missile_1_posy == vpos &&
+   missile_1_enable;
+assign ball_strobe =
+   ball_posx == hpos &&
+   ball_posy == vpos &&
+   ball_enable;
 
 always @(posedge clk_pixel) begin
   if (in_image) begin
@@ -202,20 +207,20 @@ end
 
 always @ * begin
   if (ctrlpf[2] == 0) begin
-    if (player_0_value)
+    if (player_0_value || missile_0_value)
       color = color_p0;
-    else if (player_1_value)
+    else if (player_1_value || missile_1_value)
       color = color_p1;
-    else if (playfield_value)
+    else if (playfield_value || ball_value)
       color = color_fg;
     else
       color = color_bg;
   end else begin
-    if (playfield_value)
+    if (playfield_value || ball_value)
       color = color_fg;
-    else if (player_0_value)
+    else if (player_0_value || missile_0_value)
       color = color_p0;
-    else if (player_1_value)
+    else if (player_1_value || missile_1_value)
       color = color_p1;
     else
       color = color_bg;
@@ -228,69 +233,52 @@ always @(posedge raw_clk) begin
   //if (reset) speaker_value_high <= 0;
 
   if (write_enable) begin
-    case (address[5:0])
-      6'h00: wait_vblank <= 1;
-      5'h02: wait_hblank <= 1;
-      6'h04:
+    case (address[6:0])
+      7'h00: wait_vblank <= 1;
+      7'h02: wait_hblank <= 1;
+      7'h04:
         begin
           player_0_width <= data_in[1:0];
-/*
-          case (data_in[2:0])
-            3'b101:  player_0_width <= 1;
-            3'b111:  player_0_width <= 2;
-            default: player_0_width <= 0;
-          endcase
-*/
           missile_0_width <= data_in[5:4];
         end
-      6'h05:
+      7'h05:
         begin
           player_1_width <= data_in[1:0];
-/*
-          case (data_in[2:0])
-            3'b101:  player_1_width <= 1;
-            3'b111:  player_1_width <= 2;
-            default: player_1_width <= 0;
-          endcase
-*/
           missile_1_width <= data_in[5:4];
         end
-      6'h06: color_p0 <= data_in[7:1];
-      6'h07: color_p1 <= data_in[7:1];
-      6'h08: color_fg <= data_in[7:1];
-      6'h09: color_bg <= data_in[7:1];
-      6'h0a: ctrlpf[2:0] <= data_in[2:0];
-      6'h0b: player_0_reflection <= data_in[3];
-      6'h0c: player_1_reflection <= data_in[3];
-      6'h0d:
+      7'h06: color_p0 <= data_in[7:1];
+      7'h07: color_p1 <= data_in[7:1];
+      7'h08: color_fg <= data_in[7:1];
+      7'h09: color_bg <= data_in[7:1];
+      7'h0a: ctrlpf[5:0] <= data_in[5:0];
+      7'h0b: player_0_reflection <= data_in[3];
+      7'h0c: player_1_reflection <= data_in[3];
+      7'h0d:
         playfield[21:16] <=
         {
                                   data_in[2], data_in[3],
           data_in[4], data_in[5], data_in[6], data_in[7]
         };
-      6'h0e: playfield[15:8] <= data_in[7:0];
-      6'h0f:
+      7'h0e: playfield[15:8] <= data_in[7:0];
+      7'h0f:
         playfield[7:0] <=
         {
           data_in[0], data_in[1], data_in[2], data_in[3],
           data_in[4], data_in[5], data_in[6], data_in[7]
         };
-      //6'h10: player_0_strobe  <= 1;
-      //6'h11: player_1_strobe  <= 1;
-      //6'h12: missile_0_strobe <= 1;
-      //6'h13: missile_1_strobe <= 1;
-      //6'h14: ball_strobe      <= 1;
-      6'h1b: player_0_data   <= data_in;
-      6'h1c: player_1_data   <= data_in;
-      //6'h20: player_0_h_delay  <= data_in[7:4];
-      //6'h21: player_1_h_delay  <= data_in[7:4];
-      //6'h22: missile_0_h_delay <= data_in[7:4];
-      //6'h23: missile_1_h_delay <= data_in[7:4];
-      //6'h24: ball_h_delay      <= data_in[7:4];
-      //6'h25: player_0_v_delay_flag  <= data_in[0];
-      //6'h26: player_1_v_delay_flag  <= data_in[0];
-      //6'h27: missile_1_v_delay_flag <= data_in[0];
-      6'h25:
+      7'h10: missile_0_posx[7:0] <= data_in[7:0];
+      7'h11: missile_0_posx[9:8] <= data_in[1:0];
+      7'h12: missile_0_posy[7:0] <= data_in[7:0];
+      7'h13: missile_0_posy[9:8] <= data_in[1:0];
+      7'h14: missile_0_len       <= data_in;
+      7'h15: missile_1_posx[7:0] <= data_in[7:0];
+      7'h16: missile_1_posx[9:8] <= data_in[1:0];
+      7'h17: missile_1_posy[7:0] <= data_in[7:0];
+      7'h18: missile_1_posy[9:8] <= data_in[1:0];
+      7'h19: missile_1_len       <= data_in;
+      7'h1b: player_0_data <= data_in;
+      7'h1c: player_1_data <= data_in;
+      7'h25:
         {
           ball_enable,
           missile_1_enable,
@@ -298,53 +286,22 @@ always @(posedge raw_clk) begin
           player_1_enable,
           player_0_enable
         } <= data_in[4:0];
-      6'h26: player_0_posx[7:0]  <= data_in[7:0];
-      6'h27: player_0_posx[9:8]  <= data_in[1:0];
-      6'h28: player_1_posx[7:0]  <= data_in[7:0];
-      6'h29: player_1_posx[9:8]  <= data_in[1:0];
-      6'h2a: missile_0_posx[7:0] <= data_in[7:0];
-      6'h2b: missile_0_posx[9:8] <= data_in[1:0];
-      6'h2c: missile_1_posx[7:0] <= data_in[7:0];
-      6'h2d: missile_1_posx[9:8] <= data_in[1:0];
-      6'h2e: ball_posx[7:0]      <= data_in[7:0];
-      6'h2f: ball_posx[9:8]      <= data_in[1:0];
-      6'h30: begin tx_data <= data_in; tx_strobe <= 1; end
+      7'h26: player_0_posx[7:0] <= data_in[7:0];
+      7'h27: player_0_posx[9:8] <= data_in[1:0];
+      7'h28: player_1_posx[7:0] <= data_in[7:0];
+      7'h29: player_1_posx[9:8] <= data_in[1:0];
+      7'h2a: ball_posx[7:0] <= data_in[7:0];
+      7'h2b: ball_posx[9:8] <= data_in[1:0];
+      7'h2c: ball_posy[7:0] <= data_in[7:0];
+      7'h2d: ball_posy[9:8] <= data_in[1:0];
+      7'h2e: ball_len[7:0]  <= data_in[1:0];
+      7'h42: begin tx_data <= data_in; tx_strobe <= 1; end
+      default: storage[address] <= data_in;
     endcase
   end else begin
-    //if (spi_start_1 && spi_busy_1) spi_start_1 <= 0;
     if (tx_strobe && tx_busy) tx_strobe <= 0;
 
     if (rx_ready_clear == 1) rx_ready_clear <= 0;
-
-/*
-    if (player_0_h_delay == 0) player_0_strobe <= 0;
-    else                       player_0_h_delay  <= player_0_h_delay - 1;
-
-    if (player_1_h_delay == 0) player_1_strobe <= 0;
-    else                       player_1_h_delay  <= player_1_h_delay - 1;
-
-    if (missile_0_h_delay == 0) missile_0_strobe <= 0;
-    else                        missile_0_h_delay  <= missile_0_h_delay - 1;
-
-    if (missile_1_h_delay == 0) missile_1_strobe <= 0;
-    else                        missile_1_h_delay  <= missile_1_h_delay - 1;
-
-    if (ball_h_delay == 0) ball_strobe <= 0;
-    else                   ball_h_delay <= ball_h_delay - 1;
-*/
-
-/*
-    if (in_hblank) begin
-      if (wait_image_h == 0) wait_hblank <= 0;
-    end
-*/
-
-/*
-    if (!in_vblank) begin
-      if (wait_image_v == 0) wait_vblank <= 0;
-      if (wait_image_v == 0) wait_vblank <= 0;
-    end
-*/
 
     if (hpos == hpos_start) wait_hblank_clear <= 1;
     if (vpos == vpos_start) wait_vblank_clear <= 1;
@@ -354,17 +311,23 @@ always @(posedge raw_clk) begin
     //if (in_vblank)  wait_image_v <= 0;
 
     if (enable) begin
-      case (address[5:0])
-        5'h1: data_out <= in_vblank;
-        5'h3: data_out <= in_hblank;
-        5'hc: begin data_out <= rx_data; rx_ready_clear <= 1; end
-        5'hd: data_out <= { rx_ready, tx_busy };
-        //5'he: data_out <= spi_tx_buffer_1[7:0];
-        //5'hf: data_out <= spi_rx_buffer_1[7:0];
-        //5'h10: data_out <= { 1'b0, spi_busy_1 || spi_start_1 };
-        //5'h11: data_out <= spi_cs_1;
-        //5'h12: data_out <= spi_divisor_1;
-        5'h13: data_out <= load_count;
+      case (address[7:0])
+        7'h01: data_out <= in_vblank;
+        7'h03: data_out <= in_hblank;
+        7'h0a: data_out <= ctrlpf[5:0];
+        7'h25:
+          data_out <=
+          {
+            ball_enable,
+            missile_1_enable,
+            missile_0_enable,
+            player_1_enable,
+            player_0_enable
+          };
+        7'h40: data_out <= { rx_ready, tx_busy };
+        7'h41: begin data_out <= rx_data; rx_ready_clear <= 1; end
+        7'h43: data_out <= load_count;
+        default: data_out <= storage[address];
       endcase
     end
   end
@@ -379,21 +342,6 @@ always @(posedge raw_clk) begin
     wait_vblank_clear <= 0;
   end
 end
-
-/*
-spi spi_1
-(
-  .raw_clk  (raw_clk),
-  .divisor  (spi_divisor_1),
-  .start    (spi_start_1),
-  .data_tx  (spi_tx_buffer_1),
-  .data_rx  (spi_rx_buffer_1),
-  .busy     (spi_busy_1),
-  .sclk     (spi_clk_1),
-  .mosi     (spi_mosi_1),
-  .miso     (spi_miso_1)
-);
-*/
 
 player player_0
 (
@@ -412,6 +360,30 @@ player player_1
   .width      (player_1_width),
   .strobe     (player_1_strobe),
   .reflection (player_1_reflection),
+  .clk        (raw_clk)
+);
+
+missile missile_0
+(
+  .value      (missile_0_value),
+  .width      (missile_0_width),
+  .strobe     (missile_0_strobe),
+  .clk        (raw_clk)
+);
+
+missile missile_1
+(
+  .value      (missile_1_value),
+  .width      (missile_1_width),
+  .strobe     (missile_1_strobe),
+  .clk        (raw_clk)
+);
+
+missile ball_0
+(
+  .value      (ball_value),
+  .width      (ball_width),
+  .strobe     (ball_strobe),
   .clk        (raw_clk)
 );
 

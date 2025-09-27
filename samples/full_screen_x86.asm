@@ -73,7 +73,7 @@ sprite_1_not_right:
   jnz sprite_counter_not_60
   mov [sprite_counter], byte 0
   mov al, [sprite_width]
-  mov [nusiz0], al
+  mov [ebx+nusiz0], al
   add al, 1
   cmp al, 3
   jnz sprite_size_okay
@@ -81,6 +81,9 @@ sprite_1_not_right:
 sprite_size_okay:
   mov [sprite_width], al
 sprite_counter_not_60:
+
+  mov al, [sprite_width]
+  mov [ebx+nusiz0], al
 
   mov [vsync], al
 
@@ -175,14 +178,42 @@ wait_hblank_1:
   mov [ebx+wsync], al
   mov [ebx+wsync], al
 
+  ;; Disable player_0.
+  mov [ebx+sprite_en], byte 0
+
+  mov eax, [sprite_pos_1]
+  mov [ebx+p0_xl], ax;
+
+  mov [ebx+grp0],   byte 0xff
+  mov [ebx+colup0], byte 0x0e
+  mov [ebx+nusiz0], byte 0x00
+  mov [ebx+wsync], al
+
   mov ecx, 5
 line_loop_4:
   mov [ebx+wsync], al
   sub ecx, 1
   jnz line_loop_4
 
-  ;; Disable player_0.
+wait_hblank_3:
+  test [ebx+hblank], byte 1
+  jz wait_hblank_3
+
+  ;; Enable player_0.
+  mov [ebx+sprite_en], byte 1
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+  mov [ebx+wsync], al
+
+  ;; Disable player 0.
   mov [ebx+sprite_en], byte 0
+
+wait_hblank_2:
+  test [ebx+hblank], byte 1
+  jz wait_hblank_2
+
 
   jmp loop
 

@@ -54,6 +54,10 @@ m1_xh equ 0x2d
 bl_xl equ 0x2e
 bl_xh equ 0x2f
 
+uart_status equ 0x40
+uart_rx     equ 0x41
+uart_tx     equ 0x42
+
 ;; Colors.
 color_black  equ 0x00
 color_red    equ 0x32
