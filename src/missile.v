@@ -15,7 +15,7 @@ module missile
   input clk
 );
 
-reg [2:0] sprite_clock;
+reg [3:0] sprite_clock;
 reg active;
 
 wire value = active == 0 ? 0 : 1;
@@ -28,9 +28,10 @@ always @(posedge clk) begin
     sprite_clock = sprite_clock + 1;
 
     case (width)
-      2'b00:   if (sprite_clock[0]   == 0) active <= 0;
-      2'b01:   if (sprite_clock[1:0] == 0) active <= 0;
-      default: if (sprite_clock[2:0] == 0) active <= 0;
+      2'b00: if (sprite_clock[0]   == 0) active <= 0;
+      2'b01: if (sprite_clock[1:0] == 0) active <= 0;
+      2'b10: if (sprite_clock[2:0] == 0) active <= 0;
+      2'b11: if (sprite_clock[3:0] == 0) active <= 0;
     endcase
   end
 end

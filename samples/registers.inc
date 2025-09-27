@@ -4,6 +4,8 @@ vblank equ 0x01
 wsync  equ 0x02
 hblank equ 0x03
 
+;;    d5,d4: missile size (0 to 3).
+;; d2,d1,d0: player size  (0 to 2).
 nusiz0 equ 0x04
 nusiz1 equ 0x05
 
@@ -11,6 +13,10 @@ colup0 equ 0x06
 colup1 equ 0x07
 colupf equ 0x08
 colubk equ 0x09
+
+;; d0: reflect playfield.
+;; d1: (nothing yet).
+;; d2: playfield priority (sprites above playfield or under).
 ctrlpf equ 0x0a
 
 refp0  equ 0x0b
@@ -33,6 +39,9 @@ m1_xh  equ 0x16
 m1_yl  equ 0x17
 m1_yh  equ 0x18
 m1_len equ 0x19
+
+;; Ball size.
+bl_siz equ 0x1a
 
 ;; Player 0/1 data graphics.
 grp0   equ 0x1b

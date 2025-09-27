@@ -113,7 +113,7 @@ reg [6:0] color_p0;
 reg [6:0] color_p1;
 reg [6:0] color_fg;
 reg [6:0] color_bg;
-reg [5:0] ctrlpf = 0;
+reg [3:0] ctrlpf = 0;
 
 //wire is_fg = playfield[playfield_bit];
 wire [9:0] pos_x = hpos - hpos_start;
@@ -160,7 +160,7 @@ wire ball_value;
 reg [9:0] ball_posx;
 reg [9:0] ball_posy;
 reg [7:0] ball_len;
-wire [1:0] ball_width = ctrlpf[5:4];
+reg [1:0] ball_width;
 wire ball_strobe;
 reg ball_enable;
 
@@ -246,7 +246,7 @@ always @(posedge raw_clk) begin
       7'h07: color_p1 <= data_in[7:1];
       7'h08: color_fg <= data_in[7:1];
       7'h09: color_bg <= data_in[7:1];
-      7'h0a: ctrlpf[5:0] <= data_in[5:0];
+      7'h0a: ctrlpf[3:0] <= data_in[5:0];
       7'h0b: player_0_reflection <= data_in[3];
       7'h0c: player_1_reflection <= data_in[3];
       7'h0d:
@@ -272,7 +272,7 @@ always @(posedge raw_clk) begin
       7'h17: missile_1_posy[7:0] <= data_in[7:0];
       7'h18: missile_1_posy[9:8] <= data_in[1:0];
       7'h19: missile_1_len       <= data_in;
-      //7'h1a:
+      7'h1a: ball_width <= data_in[1:0];
       7'h1b: player_0_data <= data_in;
       7'h1c: player_1_data <= data_in;
       7'h25:
@@ -311,7 +311,7 @@ always @(posedge raw_clk) begin
       case (address[7:0])
         7'h01: data_out <= in_vblank;
         7'h03: data_out <= in_hblank;
-        7'h0a: data_out <= ctrlpf[5:0];
+        7'h0a: data_out <= ctrlpf[3:0];
         7'h10: data_out <= missile_0_posx[7:0];
         7'h11: data_out <= missile_0_posx[9:8];
         7'h12: data_out <= missile_0_posy[7:0];

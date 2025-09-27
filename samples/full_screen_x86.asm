@@ -15,23 +15,30 @@ sprite_x  equ 200
 sprite_x0 equ 100
 sprite_x1 equ 500
 
-missile_0_x  equ 0x8020
-missile_0_y  equ 0x8024
+player0_enable equ 0x1d
+player1_enable equ 0x1e
+player_disable equ 0x1c
+
+;missile_0_x  equ 0x8020
+;missile_0_y  equ 0x8024
 missile_0_dx equ 0x8028
 missile_0_dy equ 0x802c
 
-missile_1_x  equ 0x8030
-missile_1_y  equ 0x8034
+;missile_1_x  equ 0x8030
+;missile_1_y  equ 0x8034
 missile_1_dx equ 0x8038
 missile_1_dy equ 0x803c
 
-ball_x       equ 0x8040
-ball_y       equ 0x8044
+;ball_x       equ 0x8040
+;ball_y       equ 0x8044
 ball_dx      equ 0x8048
 ball_dy      equ 0x804c
 
 org 0x4000
 start:
+  ;; Point to address 0 for faster access.
+  mov ebx, 0
+
   ;;        pf0    pf1      pf2
   ;; pf = 100000 00000000 00000001
 
@@ -47,28 +54,36 @@ start:
   mov [sprite_dx_0],  dword   1
   mov [sprite_dx_1],  dword  -1
 
-  mov [sprite_width],   dword 0 
+  mov [sprite_width],   dword 0x30
   mov [sprite_counter], dword 0 
 
   ;; Setup missile 0.
-  mov [missile_0_x],  dword 30
-  mov [missile_0_y],  dword 30
+  mov [m0_xl],  word 30
+  mov [m0_yl],  word 30
+  mov [m0_len], word 4
   mov [missile_0_dx], dword 1
   mov [missile_0_dy], dword 1
 
   ;; Setup missile 1.
-  mov [missile_1_x],  dword 200
-  mov [missile_1_y],  dword 200
+  mov [m1_xl],  word 200
+  mov [m1_yl],  word 200
+  mov [m1_len], word 4
   mov [missile_1_dx], dword -1
   mov [missile_1_dy], dword 1
 
   ;; Setup ball.
-  mov [ball_x],  dword 300
-  mov [ball_y],  dword 300
+  mov [bl_xl],  word 300
+  mov [bl_yl],  word 300
+  mov [bl_len], word 8
+  mov [bl_siz], byte 0x03
   mov [ball_dx], dword -1
   mov [ball_dy], dword -1
 
-  mov ebx, 0
+  ;; Setup player 1 and missile 1.
+  mov [grp1],   byte 0xff
+  mov [colup1], byte 0x1e
+  mov [nusiz1], byte 0x20
+  mov [p1_xl],  word 100
 
 loop:
   ;; Playfield has priority over sprites, do not reflect.
@@ -114,26 +129,95 @@ sprite_1_not_right:
   jnz sprite_size_okay
   mov al, 0
 sprite_size_okay:
+  or al, 0x30
   mov [sprite_width], al
 sprite_counter_not_60:
 
   mov al, [sprite_width]
   mov [ebx+nusiz0], al
 
+  xor eax, eax
+
   ;; Move missile 0.
-  mov eax, [missile_0_x]
-  add eax, [missile_0_dx]
-  mov [missile_0_x], eax
+  mov ax, [ebx+m0_xl]
+  add ax, [missile_0_dx]
+  mov [ebx+m0_xl], ax
 
-  cmp eax, 20
-  jnz missile_0_not_20
-  mov [missile_0_dx], byte 1
-missile_0_not_20:
-  cmp eax, 350
-  jnz missile_0_not_350
-  mov [missile_0_dx], byte -1
-missile_0_not_350:
+  cmp ax, 20
+  jnz missile_0_x_not_20
+  mov [missile_0_dx], dword 1
+missile_0_x_not_20:
+  cmp ax, 450
+  jnz missile_0_x_not_450
+  mov [missile_0_dx], dword -1
+missile_0_x_not_450:
 
+  mov ax, [ebx+m0_yl]
+  add ax, [missile_0_dy]
+  mov [ebx+m0_yl], ax
+
+  cmp ax, 20
+  jnz missile_0_y_not_20
+  mov [missile_0_dy], dword 1
+missile_0_y_not_20:
+  cmp ax, 350
+  jnz missile_0_y_not_350
+  mov [missile_0_dy], dword -1
+missile_0_y_not_350:
+
+  ;; Move missile 1.
+  mov ax, [ebx+m1_xl]
+  add ax, [missile_1_dx]
+  mov [ebx+m1_xl], ax
+
+  cmp ax, 20
+  jnz missile_1_x_not_20
+  mov [missile_1_dx], dword 1
+missile_1_x_not_20:
+  cmp ax, 450
+  jnz missile_1_x_not_450
+  mov [missile_1_dx], dword -1
+missile_1_x_not_450:
+
+  mov ax, [ebx+m1_yl]
+  add ax, [missile_1_dy]
+  mov [ebx+m1_yl], ax
+
+  cmp ax, 20
+  jnz missile_1_y_not_20
+  mov [missile_1_dy], dword 1
+missile_1_y_not_20:
+  cmp ax, 350
+  jnz missile_1_y_not_350
+  mov [missile_1_dy], dword -1
+missile_1_y_not_350:
+
+  ;; Move ball.
+  mov ax, [ebx+bl_xl]
+  add ax, [ball_dx]
+  mov [ebx+bl_xl], ax
+
+  cmp ax, 20
+  jnz ball_x_not_20
+  mov [ball_dx], dword 1
+ball_x_not_20:
+  cmp ax, 450
+  jnz ball_x_not_450
+  mov [ball_dx], dword -1
+ball_x_not_450:
+
+  mov ax, [ebx+bl_yl]
+  add ax, [ball_dy]
+  mov [ebx+bl_yl], ax
+
+  cmp ax, 20
+  jnz ball_y_not_20
+  mov [ball_dy], dword 1
+ball_y_not_20:
+  cmp ax, 350
+  jnz ball_y_not_350
+  mov [ball_dy], dword -1
+ball_y_not_350:
 
   mov [vsync], al
 
@@ -192,7 +276,7 @@ wait_hblank_0:
   jz wait_hblank_0
 
   ;; Enable player_0.
-  mov [ebx+sprite_en], byte 1
+  mov [ebx+sprite_en], byte player0_enable
 
   mov [ebx+wsync], al
   mov [ebx+wsync], al
@@ -205,7 +289,7 @@ wait_hblank_1:
   jz wait_hblank_1
 
   ;; Disable player_0.
-  mov [ebx+sprite_en], byte 0
+  mov [ebx+sprite_en], byte player_disable
 
   ;; Playfield has priority over sprites, do not reflect.
   mov al, 4
@@ -220,7 +304,7 @@ wait_hblank_1:
   mov [ebx+wsync], al
 
   ;; Enable player_0.
-  mov [ebx+sprite_en], byte 1
+  mov [ebx+sprite_en], byte player0_enable 
 
   mov [ebx+wsync], al
   mov [ebx+wsync], al
@@ -229,14 +313,14 @@ wait_hblank_1:
   mov [ebx+wsync], al
 
   ;; Disable player_0.
-  mov [ebx+sprite_en], byte 0
+  mov [ebx+sprite_en], byte player_disable 
 
   mov eax, [sprite_pos_1]
   mov [ebx+p0_xl], ax;
 
   mov [ebx+grp0],   byte 0xff
   mov [ebx+colup0], byte 0x0e
-  mov [ebx+nusiz0], byte 0x00
+  mov [ebx+nusiz0], byte 0x30
   mov [ebx+wsync], al
 
   mov ecx, 5
@@ -250,7 +334,7 @@ wait_hblank_3:
   jz wait_hblank_3
 
   ;; Enable player_0.
-  mov [ebx+sprite_en], byte 1
+  mov [ebx+sprite_en], byte player0_enable 
   mov [ebx+wsync], al
   mov [ebx+wsync], al
   mov [ebx+wsync], al
@@ -258,12 +342,16 @@ wait_hblank_3:
   mov [ebx+wsync], al
 
   ;; Disable player 0.
-  mov [ebx+sprite_en], byte 0
+  mov [ebx+sprite_en], byte player_disable 
 
 wait_hblank_2:
   test [ebx+hblank], byte 1
   jz wait_hblank_2
 
+  ;; Enable player 1.
+  mov [ebx+sprite_en], byte player1_enable
+  mov [ebx+wsync], al
+  mov [ebx+sprite_en], byte player_disable
 
   jmp loop
 
